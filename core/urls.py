@@ -93,7 +93,7 @@ urlpatterns = [
     path("billing/", include("billing.urls")),  # billing routes
     path("v1/keys/mine", bill_views.my_key),                 # JWT-protected
     
-        # ... your admin/auth/billing routes
+        # ... your admin/auth/billing routes here
         
     path("v1/generate/content", content_views.generate, name="generate_content"),
     path("v1/blog/preview", content_views.blog_preview, name="blog_preview"),
