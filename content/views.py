@@ -138,6 +138,8 @@
 
 
 import logging, time, uuid
+from pprint import pprint
+import time
 
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -290,6 +292,48 @@ def _cid(request):
 @authentication_classes([ApiKeyAuthentication])  # API key auth (subscriber tokens)
 @permission_classes([IsSubscriber])              # must be on a paid plan
 def generate(request):
+    print("\n===== REQUEST START =====")
+    print(f"Method: {request.method}")
+    print(f"Path:   {request.get_full_path()}")
+    print(f"User:   {getattr(request.user, 'username', request.user)}")
+
+    # Headers
+    print("\n-- HEADERS --")
+    pprint(dict(request.headers))  # DRF-friendly
+
+    # Query params (?a=1&b=2)
+    print("\n-- QUERY PARAMS --")
+    try:
+        pprint(request.query_params.dict())
+    except Exception:
+        pprint(dict(request.query_params))
+
+    # Parsed body (JSON/form)
+    print("\n-- PARSED DATA (request.data) --")
+    try:
+        pprint(request.data)
+    except Exception as e:
+        print("Could not read request.data:", e)
+
+    # Raw body (bytes)
+    print("\n-- RAW BODY (request.body) --")
+    try:
+        print(request.body.decode("utf-8", errors="replace"))
+    except Exception as e:
+        print("Could not decode raw body:", e)
+
+    # Uploaded files
+    print("\n-- FILES --")
+    pprint({k: f"{f.name} ({getattr(f, 'size', '?')} bytes)" for k, f in request.FILES.items()})
+
+    # Full WSGI environ (lots of stuff)
+    print("\n-- META --")
+    pprint(request.META)
+
+    print("===== REQUEST END =====\n")
+
+    
+    
     """
     If 'elementor' is present in body:
         - Traverse Elementor JSON like the first tab (pages/posts)
