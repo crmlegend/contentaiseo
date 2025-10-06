@@ -548,34 +548,34 @@ def generate(request):
             return Response({"elementor": updated})
 
         # ===== Original non-Elementor path (kept exactly as before) =====
-        t1 = time.time()
-        if mode == "blog":
-            reference_text = (opts.get("reference_text") or "").strip()
-            sitemap_url = (opts.get("sitemap_url") or "").strip()
-            composite = make_blog_prompt(prompt, reference_text, sitemap_url)
+    #     t1 = time.time()
+    #     if mode == "blog":
+    #         reference_text = (opts.get("reference_text") or "").strip()
+    #         sitemap_url = (opts.get("sitemap_url") or "").strip()
+    #         composite = make_blog_prompt(prompt, reference_text, sitemap_url)
 
-            doc = ai_blog_json(composite, model, provider, site, temperature)
-            elapsed = time.time() - t1
-            logger.info(
-                "gen: blog_ok cid=%s site=%s elapsed=%.2fs title_len=%d sections=%d",
-                cid, site, elapsed, len(doc.get('title') or ''), len(doc.get('sections') or [])
-            )
-            logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
-            return Response(doc)
+    #         doc = ai_blog_json(composite, model, provider, site, temperature)
+    #         elapsed = time.time() - t1
+    #         logger.info(
+    #             "gen: blog_ok cid=%s site=%s elapsed=%.2fs title_len=%d sections=%d",
+    #             cid, site, elapsed, len(doc.get('title') or ''), len(doc.get('sections') or [])
+    #         )
+    #         logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
+    #         return Response(doc)
 
-        text = ai_text(prompt, model, provider, site, temperature)
-        elapsed = time.time() - t1
-        logger.info("gen: text_ok cid=%s site=%s elapsed=%.2fs len=%d", cid, site, elapsed, len(text or ""))
-        logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
-        return Response({"text": text})
+    #     text = ai_text(prompt, model, provider, site, temperature)
+    #     elapsed = time.time() - t1
+    #     logger.info("gen: text_ok cid=%s site=%s elapsed=%.2fs len=%d", cid, site, elapsed, len(text or ""))
+    #     logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
+    #     return Response({"text": text})
 
-    except ValidationError as e:
-        logger.warning("gen: validation cid=%s site=%s detail=%s", cid, locals().get("site", ""), e.detail)
-        raise  # DRF will emit a 400
+    # except ValidationError as e:
+    #     logger.warning("gen: validation cid=%s site=%s detail=%s", cid, locals().get("site", ""), e.detail)
+    #     raise  # DRF will emit a 400
 
-    except Exception as e:
-        logger.error("gen: failed cid=%s site=%s err=%s", cid, locals().get("site", ""), str(e), exc_info=True)
-        return Response({"detail": "AI provider error. See server logs."}, status=400)
+    # except Exception as e:
+    #     logger.error("gen: failed cid=%s site=%s err=%s", cid, locals().get("site", ""), str(e), exc_info=True)
+    #     return Response({"detail": "AI provider error. See server logs."}, status=400)
 
 
 
