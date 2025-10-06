@@ -288,303 +288,619 @@ def _cid(request):
     # Try to tag logs with a per-request id (from header or create quickly)
     return request.headers.get("X-Request-Id") or f"cid-{int(time.time()*1000)}"
 
+# @api_view(["POST"])
+# @authentication_classes([ApiKeyAuthentication])  # API key auth (subscriber tokens)
+# @permission_classes([IsSubscriber])              # must be on a paid plan
+# def generate(request):
+#     print("\n===== REQUEST START =====")
+#     print(f"Method: {request.method}")
+#     print(f"Path:   {request.get_full_path()}")
+#     print(f"User:   {getattr(request.user, 'username', request.user)}")
+
+#     # Headers
+#     print("\n-- HEADERS --")
+#     pprint(dict(request.headers))  # DRF-friendly
+
+#     # Query params (?a=1&b=2)
+#     print("\n-- QUERY PARAMS --")
+#     try:
+#         pprint(request.query_params.dict())
+#     except Exception:
+#         pprint(dict(request.query_params))
+
+#     # Parsed body (JSON/form)
+#     print("\n-- PARSED DATA (request.data) --")
+#     try:
+#         pprint(request.data)
+#     except Exception as e:
+#         print("Could not read request.data:", e)
+
+#     # Raw body (bytes)
+#     print("\n-- RAW BODY (request.body) --")
+#     try:
+#         print(request.body.decode("utf-8", errors="replace"))
+#     except Exception as e:
+#         print("Could not decode raw body:", e)
+
+#     # Uploaded files
+#     print("\n-- FILES --")
+#     pprint({k: f"{f.name} ({getattr(f, 'size', '?')} bytes)" for k, f in request.FILES.items()})
+
+#     # Full WSGI environ (lots of stuff)
+#     print("\n-- META --")
+#     pprint(request.META)
+
+#     print("===== REQUEST END =====\n")
+
+    
+    
+#     """
+#     If 'elementor' is present in body:
+#         - Traverse Elementor JSON like the first tab (pages/posts)
+#         - Rewrite allowed fields with AI
+#         - Return {"elementor": [...]}
+
+#     Else:
+#         - Behave like before: 'mode' = 'replacer' => {"text": "..."} ; 'mode'='blog' => blog JSON
+#     """
+#     cid = _cid(request)
+#     t0 = time.time()
+#     try:
+#         s = GenPayload(data=request.data)
+#         s.is_valid(raise_exception=True)
+#         data = s.validated_data
+
+#         site = norm_site(data.get("site") or "")
+#         # upsert keys from body + headers (we don't log raw keys)
+#         upsert_keys_for_site(site, data.get("openai_key"), data.get("gemini_key"))
+#         upsert_keys_for_site(site, request.headers.get("X-Openai-Key"), request.headers.get("X-Gemini-Key"))
+
+#         opts = data.get("options") or {}
+#         provider, model = resolve_provider_and_model(opts, site)
+#         temperature = clamp_temperature(opts.get("temperature") or 0.7)
+#         mode = (opts.get("mode") or "replacer").lower()
+#         prompt = data.get("prompt") or ""
+
+#         keys = get_site_keys(site)
+#         logger.info(
+#             "gen: start cid=%s site=%s mode=%s provider=%s model=%s keys(openai=%s,gemini=%s) opts=%s",
+#             cid, site, mode, provider, model, _safe_bool(keys.get("openai_key")), _safe_bool(keys.get("gemini_key")),
+#             _safe_opts(opts)
+#         )
+
+#         # preflight key checks
+#         if provider == "openai" and not keys["openai_key"]:
+#             logger.warning("gen: missing_openai_key cid=%s site=%s", cid, site)
+#             return Response({"detail": "OpenAI key missing for this site."}, status=400)
+#         if provider == "gemini" and not keys["gemini_key"]:
+#             logger.warning("gen: missing_gemini_key cid=%s site=%s", cid, site)
+#             return Response({"detail": "Gemini key missing for this site."}, status=400)
+
+#         # ===== Elementor rewrite path (first tab) =====
+#         elementor = data.get("elementor")
+#         if isinstance(elementor, list):
+#             t1 = time.time()
+
+#             # --- Allowed map (mirrors your PHP rules) ---
+#             ALLOWED = {
+#                 "heading": [
+#                     {"key": "title", "html": False, "shape": "string", "purpose": "headline"},
+#                 ],
+#                 "text-editor": [
+#                     {"key": "editor", "html": True, "shape": "string", "purpose": "html"},
+#                 ],
+#                 "button": [
+#                     {"key": "text", "html": False, "shape": "string", "purpose": "label"},
+#                 ],
+#                 "icon-box": [
+#                     {"key": "title_text", "html": False, "shape": "string", "purpose": "headline"},
+#                     {"key": "description_text", "html": True, "shape": "string", "purpose": "paragraph"},
+#                 ],
+#                 "image-box": [
+#                     {"key": "title_text", "html": False, "shape": "string", "purpose": "headline"},
+#                     {"key": "description_text", "html": True, "shape": "string", "purpose": "paragraph"},
+#                 ],
+#                 "testimonial": [
+#                     {"key": "testimonial_content", "html": True, "shape": "string", "purpose": "paragraph"},
+#                     {"key": "testimonial_name", "html": False, "shape": "string", "purpose": "label"},
+#                     {"key": "testimonial_job", "html": False, "shape": "string", "purpose": "label"},
+#                 ],
+#                 "alert": [
+#                     {"key": "alert_title", "html": False, "shape": "string", "purpose": "headline"},
+#                     {"key": "alert_description", "html": True, "shape": "string", "purpose": "paragraph"},
+#                 ],
+#                 "html": [
+#                     {"key": "html", "html": True, "shape": "string", "purpose": "html"},
+#                 ],
+#                 # Repeaters
+#                 "accordion": [
+#                     {"key": "tabs[].tab_title", "html": False, "shape": "string_or_raw", "purpose": "headline"},
+#                     {"key": "tabs[].tab_content", "html": True, "shape": "string", "purpose": "html"},
+#                 ],
+#                 # NEW: nested-accordion & icon-list (as in your PHP)
+#                 "nested-accordion": [
+#                     {"key": "items[].item_title", "html": False, "shape": "string_or_raw", "purpose": "headline"},
+#                 ],
+#                 "icon-list": [
+#                     {"key": "icon_list[].text", "html": False, "shape": "string_or_raw", "purpose": "label"},
+#                 ],
+#             }
+
+#             # Helpers to preserve Elementor ["raw"] shape
+#             def _get_raw_or_string(val):
+#                 if isinstance(val, dict):
+#                     return str(val.get("raw") or "")
+#                 return str(val)
+
+#             def _put_back_raw_or_string(settings, key, original_value, new_value):
+#                 if isinstance(original_value, dict):
+#                     if key not in settings or not isinstance(settings[key], dict):
+#                         settings[key] = {}
+#                     settings[key]["raw"] = new_value
+#                 else:
+#                     settings[key] = new_value
+
+#             repeater_re = re.compile(r"^([a-z0-9_]+)\[\]\.([a-z0-9_]+)$", re.I)
+
+#             # Build an AI prompt per field (same spirit as your PHP)
+#             def build_prompt(widget_type, field_key, original, is_html):
+#                 block = "HTML" if is_html else "TEXT"
+#                 instructions = str(prompt or "")
+#                 return (
+#                     f"Rewrite the following {block} according to these instructions:\n"
+#                     f"Instructions: {instructions}\n\n\n"
+#                     f"BEGIN_ORIGINAL_{block}\n\n\n{original}\n\n\nEND_ORIGINAL_{block}\n"
+#                     f"Return ONLY the rewritten {block} in the same format as the original and do not include any additional text."
+#                 )
+                
+
+#             # Recursive traversal like Elementor structure: list[ element{ elType, widgetType, settings, elements } ]
+#             def traverse(elements):
+#                 if not isinstance(elements, list):
+#                     print(elements)
+#                     return elements
+#                 out = []
+#                 for el in elements:
+#                     print("Rauf Akbar")
+#                     print(elements)
+#                     if not isinstance(el, dict):
+#                         out.append(el); continue
+
+#                     # Process widgets
+#                     if el.get("elType") == "widget" and isinstance(el.get("settings"), dict):
+#                         widget_type = el.get("widgetType") or ""
+#                         settings = dict(el["settings"])  # copy
+
+#                         rules = ALLOWED.get(widget_type) or []
+#                         for rule in rules:
+#                             key = rule.get("key")
+#                             is_html = bool(rule.get("html"))
+#                             shape = rule.get("shape") or "string"
+
+#                             # Repeater pattern: e.g. tabs[].tab_title
+#                             m = repeater_re.match(key or "")
+#                             if m:
+#                                 rep_key, item_key = m.group(1), m.group(2)
+#                                 rep_list = settings.get(rep_key)
+#                                 if isinstance(rep_list, list):
+#                                     for idx in range(len(rep_list)):
+#                                         item = rep_list[idx]
+#                                         if not isinstance(item, dict) or item_key not in item:
+#                                             continue
+#                                         orig_val = item[item_key]
+#                                         current = _get_raw_or_string(orig_val) if shape == "string_or_raw" else str(orig_val or "")
+#                                         if not current:
+#                                             continue
+
+#                                         # AI call
+#                                         try:
+#                                             ptxt = build_prompt(widget_type, key, current, is_html)
+#                                             rewritten = ai_text(ptxt, model, provider, site, temperature)
+#                                         except Exception:
+#                                             logger.exception("ai_text failed (repeater) cid=%s site=%s widget=%s key=%s", cid, site, widget_type, key)
+#                                             raise
+
+#                                         # Put back preserving shape when needed
+#                                         if shape == "string_or_raw":
+#                                             if isinstance(orig_val, dict):
+#                                                 if not isinstance(item.get(item_key), dict):
+#                                                     item[item_key] = {}
+#                                                 item[item_key]["raw"] = rewritten
+#                                             else:
+#                                                 item[item_key] = rewritten
+#                                         else:
+#                                             item[item_key] = rewritten
+#                                 continue
+
+#                             # Flat field
+#                             if key in settings:
+#                                 orig_val = settings[key]
+#                                 current = _get_raw_or_string(orig_val) if shape == "string_or_raw" else str(orig_val or "")
+#                                 if current:
+#                                     try:
+#                                         ptxt = build_prompt(widget_type, key, current, is_html)
+#                                         rewritten = ai_text(ptxt, model, provider, site, temperature)
+#                                     except Exception:
+#                                         logger.exception("ai_text failed (flat) cid=%s site=%s widget=%s key=%s", cid, site, widget_type, key)
+#                                         raise
+
+#                                     if shape == "string_or_raw":
+#                                         _put_back_raw_or_string(settings, key, orig_val, rewritten)
+#                                     else:
+#                                         settings[key] = rewritten
+
+#                         # write back settings
+#                         el["settings"] = settings
+
+#                     # Recurse into children
+#                     if isinstance(el.get("elements"), list):
+#                         el["elements"] = traverse(el["elements"])
+
+#                     out.append(el)
+#                 return out
+
+#             # Do the traversal => many small AI calls (one per field)
+#             try:
+#                 updated = traverse(elementor)
+#             except Exception as e:
+#                 logger.error("gen: traverse failed cid=%s site=%s err=%s", cid, site, str(e), exc_info=True)
+#                 return Response({"detail": "AI processing failed while rewriting Elementor content."}, status=400)
+
+#             elapsed = time.time() - t1
+#             logger.info("gen: elementor_ok cid=%s site=%s elapsed=%.2fs", cid, site, elapsed)
+#             logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
+#             print('final Result')
+#             print(updated)
+#             return Response({"elementor": updated})
+        
+        
+        
+
+#         #===== Original non-Elementor path (kept exactly as before) =====
+#         t1 = time.time()
+#         if mode == "blog":
+#             reference_text = (opts.get("reference_text") or "").strip()
+#             sitemap_url = (opts.get("sitemap_url") or "").strip()
+#             composite = make_blog_prompt(prompt, reference_text, sitemap_url)
+
+#             doc = ai_blog_json(composite, model, provider, site, temperature)
+#             elapsed = time.time() - t1
+#             logger.info(
+#                 "gen: blog_ok cid=%s site=%s elapsed=%.2fs title_len=%d sections=%d",
+#                 cid, site, elapsed, len(doc.get('title') or ''), len(doc.get('sections') or [])
+#             )
+#             logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
+#             return Response(doc)
+
+#         text = ai_text(prompt, model, provider, site, temperature)
+#         elapsed = time.time() - t1
+#         logger.info("gen: text_ok cid=%s site=%s elapsed=%.2fs len=%d", cid, site, elapsed, len(text or ""))
+#         logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
+#         return Response({"text": text})
+
+#     except ValidationError as e:
+#         logger.warning("gen: validation cid=%s site=%s detail=%s", cid, locals().get("site", ""), e.detail)
+#         raise  # DRF will emit a 400
+
+#     except Exception as e:
+#         logger.error("gen: failed cid=%s site=%s err=%s", cid, locals().get("site", ""), str(e), exc_info=True)
+#         return Response({"detail": "AI provider error. See server logs."}, status=400)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# views.py
+
+import re, time, logging
+from pprint import pprint
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+
+logger = logging.getLogger(__name__)
+
+# If you already have these helpers in your project, keep using them.
+# Otherwise stub/replace with your own provider integration.
+# - resolve_provider_and_model(opts, site) -> ("openai"|"gemini", "model-name")
+# - clamp_temperature(x: float) -> float in [0,1]
+# - ai_text(prompt, model, provider, site, temperature) -> str
+# - _cid(request) -> request correlation id
+# - norm_site(s) -> canonical site id
+# - upsert_keys_for_site(site, openai_key, gemini_key)
+# - get_site_keys(site) -> {"openai_key": "...", "gemini_key": "..."}
+
 @api_view(["POST"])
-@authentication_classes([ApiKeyAuthentication])  # API key auth (subscriber tokens)
-@permission_classes([IsSubscriber])              # must be on a paid plan
+@authentication_classes([ApiKeyAuthentication])
+@permission_classes([IsSubscriber])
 def generate(request):
+    # ===== DIAGNOSTIC LOGGING (safe) =====
     print("\n===== REQUEST START =====")
     print(f"Method: {request.method}")
     print(f"Path:   {request.get_full_path()}")
     print(f"User:   {getattr(request.user, 'username', request.user)}")
 
-    # Headers
     print("\n-- HEADERS --")
-    pprint(dict(request.headers))  # DRF-friendly
+    try:
+        pprint(dict(request.headers))
+    except Exception:
+        pass
 
-    # Query params (?a=1&b=2)
     print("\n-- QUERY PARAMS --")
     try:
         pprint(request.query_params.dict())
     except Exception:
-        pprint(dict(request.query_params))
+        try:
+            pprint(dict(request.query_params))
+        except Exception:
+            pass
 
-    # Parsed body (JSON/form)
     print("\n-- PARSED DATA (request.data) --")
     try:
-        pprint(request.data)
+        # Avoid logging gigantic JSON blobs fully; trim if needed
+        preview = request.data
+        if isinstance(preview, dict) and "elementor" in preview:
+            # Show only counts/types to keep logs tidy
+            el = preview.get("elementor")
+            preview = dict(preview)
+            preview["elementor"] = f"<array len={len(el) if isinstance(el, list) else 'n/a'}>"
+        pprint(preview)
     except Exception as e:
         print("Could not read request.data:", e)
 
-    # Raw body (bytes)
     print("\n-- RAW BODY (request.body) --")
     try:
-        print(request.body.decode("utf-8", errors="replace"))
+        print(request.body.decode("utf-8", errors="replace")[:4000])  # cap
     except Exception as e:
         print("Could not decode raw body:", e)
 
-    # Uploaded files
     print("\n-- FILES --")
-    pprint({k: f"{f.name} ({getattr(f, 'size', '?')} bytes)" for k, f in request.FILES.items()})
-
-    # Full WSGI environ (lots of stuff)
-    print("\n-- META --")
-    pprint(request.META)
-
-    print("===== REQUEST END =====\n")
-
-    
-    
-    """
-    If 'elementor' is present in body:
-        - Traverse Elementor JSON like the first tab (pages/posts)
-        - Rewrite allowed fields with AI
-        - Return {"elementor": [...]}
-
-    Else:
-        - Behave like before: 'mode' = 'replacer' => {"text": "..."} ; 'mode'='blog' => blog JSON
-    """
-    cid = _cid(request)
-    t0 = time.time()
     try:
-        s = GenPayload(data=request.data)
-        s.is_valid(raise_exception=True)
-        data = s.validated_data
+        pprint({k: f"{f.name} ({getattr(f, 'size', '?')} bytes)" for k, f in request.FILES.items()})
+    except Exception:
+        pprint({})
 
-        site = norm_site(data.get("site") or "")
-        # upsert keys from body + headers (we don't log raw keys)
-        upsert_keys_for_site(site, data.get("openai_key"), data.get("gemini_key"))
-        upsert_keys_for_site(site, request.headers.get("X-Openai-Key"), request.headers.get("X-Gemini-Key"))
+    print("\n-- META --")
+    try:
+        pprint(request.META)
+    except Exception:
+        pass
+    print("===== REQUEST END =====\n")
+    # =====================================
 
-        opts = data.get("options") or {}
-        provider, model = resolve_provider_and_model(opts, site)
-        temperature = clamp_temperature(opts.get("temperature") or 0.7)
-        mode = (opts.get("mode") or "replacer").lower()
-        prompt = data.get("prompt") or ""
+    cid = _cid(request)
+    t0  = time.time()
 
-        keys = get_site_keys(site)
-        logger.info(
-            "gen: start cid=%s site=%s mode=%s provider=%s model=%s keys(openai=%s,gemini=%s) opts=%s",
-            cid, site, mode, provider, model, _safe_bool(keys.get("openai_key")), _safe_bool(keys.get("gemini_key")),
-            _safe_opts(opts)
-        )
+    try:
+        # ------- Minimal, Elementor-only payload -------
+        if not isinstance(request.data, dict):
+            raise ValidationError({"detail": "JSON body required."})
 
-        # preflight key checks
-        if provider == "openai" and not keys["openai_key"]:
-            logger.warning("gen: missing_openai_key cid=%s site=%s", cid, site)
-            return Response({"detail": "OpenAI key missing for this site."}, status=400)
-        if provider == "gemini" and not keys["gemini_key"]:
-            logger.warning("gen: missing_gemini_key cid=%s site=%s", cid, site)
-            return Response({"detail": "Gemini key missing for this site."}, status=400)
-
-        # ===== Elementor rewrite path (first tab) =====
+        data      = request.data
+        prompt    = str(data.get("prompt") or "")
         elementor = data.get("elementor")
-        if isinstance(elementor, list):
-            t1 = time.time()
 
-            # --- Allowed map (mirrors your PHP rules) ---
-            ALLOWED = {
-                "heading": [
-                    {"key": "title", "html": False, "shape": "string", "purpose": "headline"},
-                ],
-                "text-editor": [
-                    {"key": "editor", "html": True, "shape": "string", "purpose": "html"},
-                ],
-                "button": [
-                    {"key": "text", "html": False, "shape": "string", "purpose": "label"},
-                ],
-                "icon-box": [
-                    {"key": "title_text", "html": False, "shape": "string", "purpose": "headline"},
-                    {"key": "description_text", "html": True, "shape": "string", "purpose": "paragraph"},
-                ],
-                "image-box": [
-                    {"key": "title_text", "html": False, "shape": "string", "purpose": "headline"},
-                    {"key": "description_text", "html": True, "shape": "string", "purpose": "paragraph"},
-                ],
-                "testimonial": [
-                    {"key": "testimonial_content", "html": True, "shape": "string", "purpose": "paragraph"},
-                    {"key": "testimonial_name", "html": False, "shape": "string", "purpose": "label"},
-                    {"key": "testimonial_job", "html": False, "shape": "string", "purpose": "label"},
-                ],
-                "alert": [
-                    {"key": "alert_title", "html": False, "shape": "string", "purpose": "headline"},
-                    {"key": "alert_description", "html": True, "shape": "string", "purpose": "paragraph"},
-                ],
-                "html": [
-                    {"key": "html", "html": True, "shape": "string", "purpose": "html"},
-                ],
-                # Repeaters
-                "accordion": [
-                    {"key": "tabs[].tab_title", "html": False, "shape": "string_or_raw", "purpose": "headline"},
-                    {"key": "tabs[].tab_content", "html": True, "shape": "string", "purpose": "html"},
-                ],
-                # NEW: nested-accordion & icon-list (as in your PHP)
-                "nested-accordion": [
-                    {"key": "items[].item_title", "html": False, "shape": "string_or_raw", "purpose": "headline"},
-                ],
-                "icon-list": [
-                    {"key": "icon_list[].text", "html": False, "shape": "string_or_raw", "purpose": "label"},
-                ],
-            }
+        if not isinstance(elementor, list):
+            raise ValidationError({"elementor": "Must be an array matching Elementor JSON structure."})
 
-            # Helpers to preserve Elementor ["raw"] shape
-            def _get_raw_or_string(val):
-                if isinstance(val, dict):
-                    return str(val.get("raw") or "")
-                return str(val)
+        # Optional: site + provider/model/temperature (kept, but minimal)
+        site         = norm_site(str(data.get("site") or "")) if "site" in data else ""
+        opts         = data.get("options") or {}
+        provider, model = resolve_provider_and_model(opts, site)
+        temperature  = clamp_temperature(opts.get("temperature") or 0.7)
 
-            def _put_back_raw_or_string(settings, key, original_value, new_value):
-                if isinstance(original_value, dict):
-                    if key not in settings or not isinstance(settings[key], dict):
-                        settings[key] = {}
-                    settings[key]["raw"] = new_value
-                else:
-                    settings[key] = new_value
+        # Upsert keys from headers/body (same idea as your PHP `provider_headers`)
+        upsert_keys_for_site(site, data.get("openai_key"), data.get("gemini_key"))
+        upsert_keys_for_site(site, request.headers.get("X-OpenAI-Key"), request.headers.get("X-Gemini-Key"))
 
-            repeater_re = re.compile(r"^([a-z0-9_]+)\[\]\.([a-z0-9_]+)$", re.I)
+        keys = get_site_keys(site) if site else {"openai_key": request.headers.get("X-OpenAI-Key"), "gemini_key": request.headers.get("X-Gemini-Key")}
+        if provider == "openai" and not keys.get("openai_key"):
+            logger.warning("gen: missing_openai_key cid=%s site=%s", cid, site)
+            return Response({"detail": "OpenAI key missing."}, status=400)
+        if provider == "gemini" and not keys.get("gemini_key"):
+            logger.warning("gen: missing_gemini_key cid=%s site=%s", cid, site)
+            return Response({"detail": "Gemini key missing."}, status=400)
 
-            # Build an AI prompt per field (same spirit as your PHP)
-            def build_prompt(widget_type, field_key, original, is_html):
-                block = "HTML" if is_html else "TEXT"
-                instructions = str(prompt or "")
-                return (
-                    f"Rewrite the following {block} according to these instructions:\n"
-                    f"Instructions: {instructions}\n\n\n"
-                    f"BEGIN_ORIGINAL_{block}\n\n\n{original}\n\n\nEND_ORIGINAL_{block}\n"
-                    f"Return ONLY the rewritten {block} in the same format as the original and do not include any additional text."
-                )
-                
+        logger.info("gen: elementor start cid=%s site=%s provider=%s model=%s", cid, site, provider, model)
 
-            # Recursive traversal like Elementor structure: list[ element{ elType, widgetType, settings, elements } ]
-            def traverse(elements):
-                if not isinstance(elements, list):
-                    print(elements)
-                    return elements
-                out = []
-                for el in elements:
-                    print("Rauf Akbar")
-                    print(elements)
-                    if not isinstance(el, dict):
-                        out.append(el); continue
+        # ------- Allowed widgets/fields (mirror of your PHP) -------
+        ALLOWED = {
+            "heading": [
+                {"key": "title", "html": False, "shape": "string", "purpose": "headline"},
+            ],
+            "text-editor": [
+                {"key": "editor", "html": True, "shape": "string", "purpose": "html"},
+            ],
+            "button": [
+                {"key": "text", "html": False, "shape": "string", "purpose": "label"},
+            ],
+            "icon-box": [
+                {"key": "title_text", "html": False, "shape": "string", "purpose": "headline"},
+                {"key": "description_text", "html": True, "shape": "string", "purpose": "paragraph"},
+            ],
+            "image-box": [
+                {"key": "title_text", "html": False, "shape": "string", "purpose": "headline"},
+                {"key": "description_text", "html": True, "shape": "string", "purpose": "paragraph"},
+            ],
+            "testimonial": [
+                {"key": "testimonial_content", "html": True, "shape": "string", "purpose": "paragraph"},
+                {"key": "testimonial_name", "html": False, "shape": "string", "purpose": "label"},
+                {"key": "testimonial_job", "html": False, "shape": "string", "purpose": "label"},
+            ],
+            "alert": [
+                {"key": "alert_title", "html": False, "shape": "string", "purpose": "headline"},
+                {"key": "alert_description", "html": True, "shape": "string", "purpose": "paragraph"},
+            ],
+            "html": [
+                {"key": "html", "html": True, "shape": "string", "purpose": "html"},
+            ],
+            # Repeaters
+            "accordion": [
+                {"key": "tabs[].tab_title", "html": False, "shape": "string_or_raw", "purpose": "headline"},
+                {"key": "tabs[].tab_content", "html": True, "shape": "string", "purpose": "html"},
+            ],
+            # NEW: nested-accordion & icon-list
+            "nested-accordion": [
+                {"key": "items[].item_title", "html": False, "shape": "string_or_raw", "purpose": "headline"},
+            ],
+            "icon-list": [
+                {"key": "icon_list[].text", "html": False, "shape": "string_or_raw", "purpose": "label"},
+            ],
+        }
 
-                    # Process widgets
-                    if el.get("elType") == "widget" and isinstance(el.get("settings"), dict):
-                        widget_type = el.get("widgetType") or ""
-                        settings = dict(el["settings"])  # copy
+        repeater_re = re.compile(r"^([a-z0-9_]+)\[\]\.([a-z0-9_]+)$", re.I)
 
-                        rules = ALLOWED.get(widget_type) or []
-                        for rule in rules:
-                            key = rule.get("key")
-                            is_html = bool(rule.get("html"))
-                            shape = rule.get("shape") or "string"
+        def _get_raw_or_string(val):
+            """Preserve Elementor's {'raw': '...'} when present."""
+            if isinstance(val, dict):
+                return str(val.get("raw") or "")
+            return str(val or "")
 
-                            # Repeater pattern: e.g. tabs[].tab_title
-                            m = repeater_re.match(key or "")
-                            if m:
-                                rep_key, item_key = m.group(1), m.group(2)
-                                rep_list = settings.get(rep_key)
-                                if isinstance(rep_list, list):
-                                    for idx in range(len(rep_list)):
-                                        item = rep_list[idx]
-                                        if not isinstance(item, dict) or item_key not in item:
-                                            continue
-                                        orig_val = item[item_key]
-                                        current = _get_raw_or_string(orig_val) if shape == "string_or_raw" else str(orig_val or "")
-                                        if not current:
-                                            continue
+        def _put_back_raw_or_string(settings, key, original_value, new_value):
+            """Write back to settings preserving raw-shape if the original was a dict."""
+            if isinstance(original_value, dict):
+                if key not in settings or not isinstance(settings[key], dict):
+                    settings[key] = {}
+                settings[key]["raw"] = new_value
+            else:
+                settings[key] = new_value
 
-                                        # AI call
-                                        try:
-                                            ptxt = build_prompt(widget_type, key, current, is_html)
-                                            rewritten = ai_text(ptxt, model, provider, site, temperature)
-                                        except Exception:
-                                            logger.exception("ai_text failed (repeater) cid=%s site=%s widget=%s key=%s", cid, site, widget_type, key)
-                                            raise
+        def build_prompt(widget_type, field_key, original, is_html):
+            block = "HTML" if is_html else "TEXT"
+            instructions = prompt
+            return (
+                f"Rewrite the following {block} according to these instructions:\n"
+                f"Instructions: {instructions}\n\n\n"
+                f"BEGIN_ORIGINAL_{block}\n\n\n{original}\n\n\nEND_ORIGINAL_{block}\n"
+                f"Return ONLY the rewritten {block} in the same format as the original and do not include any additional text."
+            )
 
-                                        # Put back preserving shape when needed
-                                        if shape == "string_or_raw":
-                                            if isinstance(orig_val, dict):
-                                                if not isinstance(item.get(item_key), dict):
-                                                    item[item_key] = {}
-                                                item[item_key]["raw"] = rewritten
-                                            else:
-                                                item[item_key] = rewritten
-                                        else:
-                                            item[item_key] = rewritten
-                                continue
+        def traverse(elements):
+            if not isinstance(elements, list):
+                return elements
+            out = []
+            for el in elements:
+                if not isinstance(el, dict):
+                    out.append(el)
+                    continue
 
-                            # Flat field
-                            if key in settings:
-                                orig_val = settings[key]
-                                current = _get_raw_or_string(orig_val) if shape == "string_or_raw" else str(orig_val or "")
-                                if current:
+                # Process widgets
+                if el.get("elType") == "widget" and isinstance(el.get("settings"), dict):
+                    widget_type = el.get("widgetType") or ""
+                    settings    = dict(el["settings"])  # copy
+
+                    rules = ALLOWED.get(widget_type) or []
+                    for rule in rules:
+                        key     = rule.get("key")
+                        is_html = bool(rule.get("html"))
+                        shape   = (rule.get("shape") or "string")
+
+                        # Repeater pattern: e.g., tabs[].tab_title
+                        m = repeater_re.match(key or "")
+                        if m:
+                            rep_key, item_key = m.group(1), m.group(2)
+                            rep_list = settings.get(rep_key)
+                            if isinstance(rep_list, list):
+                                for idx in range(len(rep_list)):
+                                    item = rep_list[idx]
+                                    if not isinstance(item, dict) or item_key not in item:
+                                        continue
+                                    orig_val = item[item_key]
+                                    current  = _get_raw_or_string(orig_val) if shape == "string_or_raw" else str(orig_val or "")
+                                    if not current:
+                                        continue
+
                                     try:
-                                        ptxt = build_prompt(widget_type, key, current, is_html)
+                                        ptxt      = build_prompt(widget_type, key, current, is_html)
                                         rewritten = ai_text(ptxt, model, provider, site, temperature)
                                     except Exception:
-                                        logger.exception("ai_text failed (flat) cid=%s site=%s widget=%s key=%s", cid, site, widget_type, key)
+                                        logger.exception("ai_text failed (repeater) cid=%s site=%s widget=%s key=%s", cid, site, widget_type, key)
                                         raise
 
+                                    # Put back preserving shape
                                     if shape == "string_or_raw":
-                                        _put_back_raw_or_string(settings, key, orig_val, rewritten)
+                                        if isinstance(orig_val, dict):
+                                            if not isinstance(item.get(item_key), dict):
+                                                item[item_key] = {}
+                                            item[item_key]["raw"] = rewritten
+                                        else:
+                                            item[item_key] = rewritten
                                     else:
-                                        settings[key] = rewritten
+                                        item[item_key] = rewritten
+                            # proceed to next rule
+                            continue
 
-                        # write back settings
-                        el["settings"] = settings
+                        # Flat key
+                        if key in settings:
+                            orig_val = settings[key]
+                            current  = _get_raw_or_string(orig_val) if shape == "string_or_raw" else str(orig_val or "")
+                            if current:
+                                try:
+                                    ptxt      = build_prompt(widget_type, key, current, is_html)
+                                    rewritten = ai_text(ptxt, model, provider, site, temperature)
+                                except Exception:
+                                    logger.exception("ai_text failed (flat) cid=%s site=%s widget=%s key=%s", cid, site, widget_type, key)
+                                    raise
 
-                    # Recurse into children
-                    if isinstance(el.get("elements"), list):
-                        el["elements"] = traverse(el["elements"])
+                                if shape == "string_or_raw":
+                                    _put_back_raw_or_string(settings, key, orig_val, rewritten)
+                                else:
+                                    settings[key] = rewritten
 
-                    out.append(el)
-                return out
+                    # write back settings
+                    el["settings"] = settings
 
-            # Do the traversal => many small AI calls (one per field)
-            try:
-                updated = traverse(elementor)
-            except Exception as e:
-                logger.error("gen: traverse failed cid=%s site=%s err=%s", cid, site, str(e), exc_info=True)
-                return Response({"detail": "AI processing failed while rewriting Elementor content."}, status=400)
+                # Recurse into children
+                if isinstance(el.get("elements"), list):
+                    el["elements"] = traverse(el["elements"])
 
-            elapsed = time.time() - t1
-            logger.info("gen: elementor_ok cid=%s site=%s elapsed=%.2fs", cid, site, elapsed)
-            logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
-            print('final Result')
-            print(updated)
-            return Response({"elementor": updated})
-        
-        
-        
+                out.append(el)
+            return out
 
-        #===== Original non-Elementor path (kept exactly as before) =====
         t1 = time.time()
-        if mode == "blog":
-            reference_text = (opts.get("reference_text") or "").strip()
-            sitemap_url = (opts.get("sitemap_url") or "").strip()
-            composite = make_blog_prompt(prompt, reference_text, sitemap_url)
+        try:
+            updated = traverse(elementor)
+        except Exception as e:
+            logger.error("gen: traverse failed cid=%s site=%s err=%s", cid, site, str(e), exc_info=True)
+            return Response({"detail": "AI processing failed while rewriting Elementor content."}, status=400)
 
-            doc = ai_blog_json(composite, model, provider, site, temperature)
-            elapsed = time.time() - t1
-            logger.info(
-                "gen: blog_ok cid=%s site=%s elapsed=%.2fs title_len=%d sections=%d",
-                cid, site, elapsed, len(doc.get('title') or ''), len(doc.get('sections') or [])
-            )
-            logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
-            return Response(doc)
-
-        text = ai_text(prompt, model, provider, site, temperature)
         elapsed = time.time() - t1
-        logger.info("gen: text_ok cid=%s site=%s elapsed=%.2fs len=%d", cid, site, elapsed, len(text or ""))
+        logger.info("gen: elementor_ok cid=%s site=%s elapsed=%.2fs", cid, site, elapsed)
         logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
-        return Response({"text": text})
+
+        # Exactly what your PHP client expects:
+        # process_elementor() -> do_post() expects {"elementor": [...]}
+        return Response({"elementor": updated}, status=200)
 
     except ValidationError as e:
-        logger.warning("gen: validation cid=%s site=%s detail=%s", cid, locals().get("site", ""), e.detail)
-        raise  # DRF will emit a 400
-
+        logger.warning("gen: validation cid=%s detail=%s", cid, e.detail)
+        raise
     except Exception as e:
-        logger.error("gen: failed cid=%s site=%s err=%s", cid, locals().get("site", ""), str(e), exc_info=True)
+        logger.error("gen: failed cid=%s err=%s", cid, str(e), exc_info=True)
         return Response({"detail": "AI provider error. See server logs."}, status=400)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
