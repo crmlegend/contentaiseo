@@ -554,7 +554,7 @@ def generate(request):
         
         
 
-        ===== Original non-Elementor path (kept exactly as before) =====
+        #===== Original non-Elementor path (kept exactly as before) =====
         t1 = time.time()
         if mode == "blog":
             reference_text = (opts.get("reference_text") or "").strip()
