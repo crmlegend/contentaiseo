@@ -782,7 +782,7 @@ def generate(request):
                 f"Rewrite the following {block} according to these instructions:\n"
                 f"Instructions: {instructions}\n\n\n"
                 f"BEGIN_ORIGINAL_{block}\n\n\n{original}\n\n\nEND_ORIGINAL_{block}\n"
-                f"Return ONLY the rewritten {block} in the same format as the original and do not include any additional text."
+                f"Return ONLY the rewritten {block} in the same format as the original and do not include any additional text or any additional signs [like html or text or any additional quotes, just give me the plain and professional {block}."
             )
 
         def traverse(elements):
