@@ -193,6 +193,10 @@ def _safe_opts(opts: dict):
             out[k] = v if isinstance(v, (str, int, float, bool)) else type(v).__name__
     return out
 
+
+
+
+
 # @api_view(["POST"])
 # @authentication_classes([ApiKeyAuthentication])  # API key auth (subscriber tokens)
 # @permission_classes([IsSubscriber])              # must be on a paid plan
@@ -287,6 +291,9 @@ def _safe_opts(opts):
 def _cid(request):
     # Try to tag logs with a per-request id (from header or create quickly)
     return request.headers.get("X-Request-Id") or f"cid-{int(time.time()*1000)}"
+
+
+
 
 # @api_view(["POST"])
 # @authentication_classes([ApiKeyAuthentication])  # API key auth (subscriber tokens)
@@ -585,6 +592,8 @@ def _cid(request):
 #     except Exception as e:
 #         logger.error("gen: failed cid=%s site=%s err=%s", cid, locals().get("site", ""), str(e), exc_info=True)
 #         return Response({"detail": "AI provider error. See server logs."}, status=400)
+
+
 
 
 
