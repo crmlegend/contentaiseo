@@ -549,6 +549,8 @@ def generate(request):
             elapsed = time.time() - t1
             logger.info("gen: elementor_ok cid=%s site=%s elapsed=%.2fs", cid, site, elapsed)
             logger.info("gen: done cid=%s total=%.2fs", cid, time.time() - t0)
+            print('final Result')
+            print(updated)
             return Response({"elementor": updated})
         
         
