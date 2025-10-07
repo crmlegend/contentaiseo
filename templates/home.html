@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Content Genie · Get your API key</title>
 
-  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -44,11 +43,9 @@
 </head>
 <body class="antialiased text-slate-900 bg-white">
 
-  <!-- NAV -->
   <header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur border-b border-slate-100">
     <div class="px-5 lg:px-10 w-full flex items-center justify-between h-16">
       <a href="/" class="flex items-center gap-3 group">
-        <!-- YOUR ICON -->
         <div class="h-9 w-9 rounded-xl bg-brand-600 grid place-items-center text-white shadow-glow">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                fill="currentColor" width="20" height="20" class="h-5 w-5">
@@ -80,7 +77,6 @@
     </div>
   </header>
 
-  <!-- HERO -->
   <section class="relative w-full overflow-hidden">
     <div class="absolute inset-0 -z-10 bg-gradient-to-b from-white via-white to-indigo-50/40"></div>
     <div class="absolute inset-0 -z-10 bg-radial-fade"></div>
@@ -110,11 +106,11 @@
         {% else %}
           <div class="mt-7 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <a href="{% url 'login' %}?next=/dashboard/"
-               class="inline-flex items-center justify-center rounded-xl bg-brand-600 text-white px-6 py-3 font-medium hover:bg-brand-700 shadow-glow transition">
+               class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-brand-600 text-white px-6 py-3 font-medium hover:bg-brand-700 shadow-glow transition">
               Get your API key
             </a>
             <a href="#features"
-               class="inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-medium text-slate-700 hover:bg-slate-50">
+               class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-medium text-slate-700 hover:bg-slate-50">
               See how it works
             </a>
           </div>
@@ -122,10 +118,8 @@
         {% endif %}
       </div>
 
-      <!-- Enhanced Visual metric card (no hover effects) -->
       <div class="w-full">
         <div class="relative mx-auto w-full max-w-md rounded-2xl bg-white/80 backdrop-blur shadow-soft ring-1 ring-slate-100 p-6">
-          <!-- KPI grid -->
           <div class="grid grid-cols-2 gap-4">
             <div class="rounded-xl border border-slate-200 p-4">
               <p class="text-xs text-slate-500">Pages rewritten</p>
@@ -161,7 +155,6 @@
             </div>
           </div>
 
-          <!-- Key box -->
           <div class="mt-6 rounded-xl bg-gradient-to-br from-slate-50 to-white p-4 border border-slate-200">
             <p class="text-xs text-slate-500 mb-2">Your API key (example)</p>
             <code class="block text-sm bg-white border border-slate-200 rounded-lg p-3 text-slate-800 overflow-x-auto">
@@ -178,7 +171,6 @@
     </div>
   </section>
 
-  <!-- FEATURES -->
   <section id="features" class="px-5 sm:px-8 lg:px-12 xl:px-20 py-16 lg:py-20">
     <h2 class="text-3xl font-bold mb-2">Everything you need</h2>
     <p class="text-slate-600 mb-10">Purpose-built for Elementor content and AI blogging.</p>
@@ -217,13 +209,11 @@
     </div>
   </section>
 
-  <!-- PRICING -->
   <section id="pricing" class="px-5 sm:px-8 lg:px-12 xl:px-20 pb-20 lg:pb-24">
     <h2 class="text-3xl font-bold mb-2">Simple pricing</h2>
     <p class="text-slate-600 mb-10">Pick the plan that fits your publishing speed.</p>
 
     <div class="grid md:grid-cols-2 gap-6">
-      <!-- Monthly -->
       <div class="rounded-2xl border border-slate-200 bg-white p-6 hover:shadow-soft transition-shadow">
         <h3 class="font-semibold">Monthly</h3>
         <p class="mt-2 text-3xl font-extrabold">$200<span class="text-base text-slate-500">/mo</span></p>
@@ -242,7 +232,6 @@
         </div>
       </div>
 
-      <!-- Yearly -->
       <div class="rounded-2xl border-2 border-brand-600 bg-white p-6 shadow-lg">
         <div class="inline-flex items-center gap-2 text-xs font-medium text-brand-600 bg-indigo-50 px-2 py-1 rounded-full">
           Best value — Save $600/yr
@@ -266,12 +255,10 @@
     </div>
   </section>
 
-  <!-- FAQ (full-width items, no search) -->
   <section id="faq" class="px-5 sm:px-8 lg:px-12 xl:px-20 pb-20">
     <h2 class="text-3xl font-bold mb-6">FAQ</h2>
 
     <div id="faqList" class="space-y-4">
-      <!-- ITEM -->
       <details class="faq-item rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-0 shadow-sm open:shadow-soft transition">
         <summary class="faq-summary flex items-center justify-between gap-3 cursor-pointer select-none px-5 py-4">
           <span class="font-medium">Will this change my Elementor layout?</span>
@@ -286,7 +273,6 @@
         </div>
       </details>
 
-      <!-- ITEM -->
       <details class="faq-item rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-0 shadow-sm transition">
         <summary class="faq-summary flex items-center justify-between gap-3 cursor-pointer select-none px-5 py-4">
           <span class="font-medium">Can I preview changes first?</span>
@@ -301,7 +287,6 @@
         </div>
       </details>
 
-      <!-- ITEM -->
       <details class="faq-item rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-0 shadow-sm transition">
         <summary class="faq-summary flex items-center justify-between gap-3 cursor-pointer select-none px-5 py-4">
           <span class="font-medium">How does the blog creator work?</span>
@@ -316,7 +301,6 @@
         </div>
       </details>
 
-      <!-- EXTRA ITEM -->
       <details class="faq-item rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-0 shadow-sm transition">
         <summary class="faq-summary flex items-center justify-between gap-3 cursor-pointer select-none px-5 py-4">
           <span class="font-medium">Which models do you support?</span>
@@ -333,7 +317,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="w-full border-t border-slate-200 py-8">
     <div class="px-5 sm:px-8 lg:px-12 xl:px-20 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500">
       <p>© {{ now|default:2025 }} Content Genie. All rights reserved.</p>
@@ -346,7 +329,6 @@
     </div>
   </footer>
 
-  <!-- Interactivity: FAQ accordion chevrons + smooth expand/collapse -->
   <script>
     (function () {
       const items = document.querySelectorAll('.faq-item');
@@ -380,4 +362,3 @@
   </script>
 </body>
 </html>
-
