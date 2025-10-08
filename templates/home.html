@@ -68,7 +68,7 @@
           <a href="{% url 'login' %}" class="text-slate-700 hover:text-slate-900">Log in</a>
           <a href="{% url 'login' %}?next=/dashboard/"
              class="rounded-xl bg-brand-600 text-white px-4 py-2 font-medium hover:bg-brand-700">
-            Subscribe
+            Start Now
           </a>
         {% endif %}
       </nav>
@@ -124,7 +124,7 @@
               </a>
               <a href="{% url 'login' %}?next=/dashboard/"
                  class="block w-full text-center rounded-xl bg-brand-600 text-white px-4 py-3 font-medium hover:bg-brand-700">
-                Subscribe
+                Start Now
               </a>
             {% endif %}
           </div>
@@ -286,7 +286,7 @@
           {% if request.user.is_authenticated %}
             <a href="{% url 'dashboard' %}" class="w-full inline-flex justify-center rounded-xl bg-brand-600 text-white px-4 py-2.5 font-medium hover:bg-brand-700">Go to dashboard</a>
           {% else %}
-            <a href="{% url 'login' %}?next=/dashboard/" class="w-full inline-flex justify-center rounded-xl bg-brand-600 text-white px-4 py-2.5 font-medium hover:bg-brand-700">Subscribe</a>
+            <a href="{% url 'login' %}?next=/dashboard/" class="w-full inline-flex justify-center rounded-xl bg-brand-600 text-white px-4 py-2.5 font-medium hover:bg-brand-700">Start Now</a>
           {% endif %}
         </div>
       </div>
@@ -307,7 +307,7 @@
           {% if request.user.is_authenticated %}
             <a href="{% url 'dashboard' %}" class="w-full inline-flex justify-center rounded-xl bg-brand-600 text-white px-4 py-2.5 font-medium hover:bg-brand-700">Go to dashboard</a>
           {% else %}
-            <a href="{% url 'login' %}?next=/dashboard/" class="w-full inline-flex justify-center rounded-xl bg-brand-600 text-white px-4 py-2.5 font-medium hover:bg-brand-700">Subscribe</a>
+            <a href="{% url 'login' %}?next=/dashboard/" class="w-full inline-flex justify-center rounded-xl bg-brand-600 text-white px-4 py-2.5 font-medium hover:bg-brand-700">Start Now</a>
           {% endif %}
         </div>
       </div>
@@ -466,3 +466,5 @@
   </script>
 </body>
 </html>
+
+
