@@ -53,7 +53,7 @@ class ApiKey(models.Model):
     # Legacy helper (you currently store plaintext suffix alongside prefix)
     plain_suffix = models.TextField(null=True, blank=True)
 
-    # ---------- Request-based trial fields ----------
+    # ---------- Request-based trial fields --------------
     # e.g., 10 for trials; NULL for paid keys (no request limit)
     trial_quota = models.PositiveIntegerField(null=True, blank=True)
     # persisted count (for admin/analytics & fallback when cache is down)
@@ -61,6 +61,7 @@ class ApiKey(models.Model):
     # last time this key was used
     last_used_at = models.DateTimeField(null=True, blank=True)
     # ------------------------------------------------
+
 
     class Meta:
         ordering = ["-created_at"]
