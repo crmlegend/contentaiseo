@@ -17,7 +17,6 @@ from .forms import SignUpForm, NiceLoginForm, ProfileForm, DashboardPasswordChan
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
-
 User = get_user_model()
 
 # ---------------------------
@@ -25,7 +24,6 @@ User = get_user_model()
 # ---------------------------
 def home(request):
     return render(request, "home.html")
-
 
 # ---------------------------
 # Auth pages (login/signup)
@@ -38,12 +36,10 @@ class NiceLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy("dashboard")
 
-
 class SignUpView(CreateView):
     form_class = SignUpForm
     template_name = "registration/signup.html"
     success_url = reverse_lazy("login")  # after signup, go to login
-
 
 # ---------------------------
 # API (optional)
@@ -56,7 +52,6 @@ def register(request):
     s.save()
     return Response({"ok": True})
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def me(request):
@@ -66,68 +61,6 @@ def me(request):
         "email": u.email,
         "stripe_customer_id": getattr(u, "stripe_customer_id", None)
     })
-
-
-# ---------------------------
-# Dashboard (profile + password + api key prefix)
-# ---------------------------
-# @login_required
-# def dashboard(request):
-#     user = request.user
-
-#     profile_form = ProfileForm(instance=user)
-#     pwd_form = DashboardPasswordChangeForm(user=user)
-
-#     if request.method == "POST":
-#         action = request.POST.get("action")
-
-#         if action == "update_profile":
-#             profile_form = ProfileForm(request.POST, instance=user)
-#             if profile_form.is_valid():
-#                 profile_form.save()
-#                 messages.success(request, "Profile updated.")
-#                 return redirect("dashboard")
-
-#         elif action == "change_password":
-#             pwd_form = DashboardPasswordChangeForm(user=user, data=request.POST)
-#             if pwd_form.is_valid():
-#                 pwd_form.save()  # re-hashes and updates password
-#                 messages.success(request, "Password changed.")
-#                 return redirect("dashboard")
-
-#     # Short-lived JWT for client-side calls (if you need it)
-#     access = str(RefreshToken.for_user(user).access_token)
-
-#     # Latest active API key (prefix only)
-#     latest_key = (
-#         ApiKey.objects
-#         .filter(user=user, status="active", revoked_at__isnull=True)
-#         .order_by("-created_at")
-#         .first()
-#     )
-#     latest_key_prefix = latest_key.key_prefix if latest_key else None
-
-#     return render(
-#         request,
-#         "dashboard.html",
-#         {
-#             "access": access,
-#             "profile_form": profile_form,
-#             "pwd_form": pwd_form,
-#             "latest_key_prefix": latest_key_prefix,
-#         },
-#     )
-
-
-
-
-
-
-
-
-
-
-
 
 @login_required
 def dashboard(request):
@@ -181,6 +114,20 @@ def dashboard(request):
         if suffix:                           # only build if suffix exists
             full_key = f"{key_row.key_prefix or ''}{suffix}"
 
+    # ----- Trial usage & plan status -----
+    trial_used = None
+    trial_quota = None
+    is_trial = False
+    is_subscribed = False
+    if key_row:
+        if key_row.plan == "trial":
+            is_trial = True
+            # used_requests increments with each API call
+            trial_used = key_row.used_requests or 0
+            trial_quota = key_row.trial_quota or 0
+        else:
+            is_subscribed = True
+
     # ----- Context for your template -----
     return render(request, "dashboard.html", {
         "access": access,
@@ -188,28 +135,19 @@ def dashboard(request):
         "pwd_form": pwd_form,
 
         # KPI cards / other blocks
-        "key": key_row,                      # your template already uses {% if key %}...
+        "key": key_row,
         "latest_key_prefix": latest_key_prefix,
 
         # The block that prints {{ cd }} expects this name:
-        "cd": full_key,                      # will show the full key if available
-        "raw_api_key": full_key,             # optional duplicate, harmless
+        "cd": full_key,
+        "raw_api_key": full_key,
+
+        # Trial and subscription data
+        "is_trial": is_trial,
+        "is_subscribed": is_subscribed,
+        "trial_used": trial_used,
+        "trial_quota": trial_quota,
     })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # ---------------------------
 # profile_update (for your /profile/update URL)

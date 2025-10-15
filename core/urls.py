@@ -1,107 +1,54 @@
-"""
-URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-# from django.urls import path
-# from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-# from accounts import views as acc_views
-# from accounts import views as acc
-from django.http import HttpResponse
-from billing.views import verify_key 
-
-
-
-
-
-
-# from django.contrib import admin
-from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from accounts import views as acc_views
-from billing import views as bill_views
-from content import views as content_views
-from django.contrib.auth import views as auth_views
-
-
-def home(_):  # quick placeholder landing page
-    return HttpResponse("Home")
-
-
-
-
 
 # core/urls.py
-
-
-
 from django.contrib import admin
-from accounts.views import home, dashboard  # import the views
+from django.urls import path, include
+from django.http import HttpResponse
+
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+from accounts import views as acc_views
+from content import views as content_views
+from billing import views as bill_views
+# NOTE: billing views are routed via billing/urls.py – no need to import them here
+
+# accounts/views.py (or another appropriate file)
+from django.shortcuts import render
+
+def home(request):
+    """Renders the home.html page."""
+    # Django will look for 'home.html' inside the 'templates' directory
+    return render(request, 'home.html')
 
 urlpatterns = [
+    # Admin
     path("admin/", admin.site.urls),
 
-    # Your accounts routes (custom first, then django's)
+    # Landing
+    path("", home, name="home"),
+
+    # Accounts (your app + Django auth)
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
 
-    # pages
-    path("", home, name="home"),                 # ← homepage at "/"
-    # path("dashboard/", dashboard, name="dashboard"),
-]
+    # Auth API (JWT + register + profile)
+    path("auth/login", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("auth/refresh", TokenRefreshView.as_view(), name="token_refresh"),
+    path("auth/register", acc_views.register, name="auth_register"),
+    path("users/me", acc_views.me, name="users_me"),
 
+    # Billing: include all billing routes (start, webhook, key, verify, test)
+    path("billing/", include("billing.urls")),   # -> /billing/start/, /billing/webhook/, /billing/key/, /billing/verify/
 
+    # (Optional legacy aliases — keep only if clients already use these)
+    path("api/key/verify/", bill_views.verify_key, name="api_key_verify"),
+    # path("v1/billing/checkout", bill_views.start_checkout, name="start_checkout_legacy"),
+    # path("v1/keys/mine", bill_views.my_key, name="my_key_legacy"),
 
-
-
-
-
-urlpatterns = [
-    path("", home, name="home"),
-    path("admin/", admin.site.urls),
-    path("accounts/", include("accounts.urls")), 
-    path("accounts/", include("django.contrib.auth.urls")),  # login/logout/etc. 
-    path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
-    path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
-      
-    # path("admin/", admin.site.urls),
-
-    # Accounts
-    path("api/key/verify/", bill_views.verify_key, name="api_key_verify"),  # public
-    path("auth/register", acc_views.register),
-    path("auth/login", TokenObtainPairView.as_view()),
-    path("auth/refresh", TokenRefreshView.as_view()),
-    path("users/me", acc_views.me),
-    # path("dashboard/", dashboard, name="dashboard"), 
-    path("", home, name="home"),     
-    # path("billing/", include("billing.urls")),
-
-    # Billing
-    path("v1/billing/checkout", bill_views.start_checkout),  # JWT-protected
-    path("webhooks/stripe", bill_views.stripe_webhook),      # public (Stripe calls)
-    path("billing/", include("billing.urls")),  # billing routes
-    path("v1/keys/mine", bill_views.my_key),                 # JWT-protected
-    
-        # ... your admin/auth/billing routes here
-        
+    # Product API (guarded by ApiKeyAuthentication for /v1/*)
     path("v1/generate/content", content_views.generate, name="generate_content"),
     path("v1/blog/preview", content_views.blog_preview, name="blog_preview"),
-    
-    # path("dashboard/", bill_views.dashboard),
-    path("profile/update", acc_views.profile_update),
 ]
+
 
 
 
