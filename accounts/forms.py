@@ -11,7 +11,6 @@ INPUT = (
     "focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600"
 )
 
-
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=False)
 

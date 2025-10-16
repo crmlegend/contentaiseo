@@ -135,7 +135,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://871ed428e636.ngrok-free.app",
     "https://cd79f9e19024.ngrok-free.app",
     "https://193edd64fb8d.ngrok-free.app",
-    "https://contentaiseo.com",
+    "https://contentaiseo.com/",
 
 ]
 

@@ -11,8 +11,7 @@ app = Celery("core")
 # Read settings from Django settings.py, all CELERY_ variables
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
-# Automatically discover tasks in all installed app
-
+# Automatically discover tasks in all installed apps
 app.autodiscover_tasks()
 
 
