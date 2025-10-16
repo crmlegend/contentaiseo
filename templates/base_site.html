@@ -1,0 +1,42 @@
+{% extends "registration/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+  .cg-download-card{
+    border:1px solid #e5e7eb;background:#fff;border-radius:10px;
+    padding:14px 16px;margin:12px 0 18px;box-shadow:0 1px 2px rgba(0,0,0,.05);
+  }
+  .cg-download-card h3{margin:0 0 6px;font-size:16px;}
+  .cg-download-card p{margin:0 0 10px;color:#4b5563;font-size:13px;}
+  .cg-download-btn{
+    display:inline-block;padding:8px 14px;border-radius:8px;
+    background:#2563eb;color:#fff;text-decoration:none;font-weight:600;
+  }
+  .cg-download-btn:hover{background:#1d4ed8;}
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Only on the admin dashboard (index)
+  if (!document.body.classList.contains('dashboard')) return;
+
+  const content = document.querySelector('#content') || document.querySelector('.content');
+  if (!content) return;
+
+  const card = document.createElement('div');
+  card.className = 'cg-download-card';
+  card.innerHTML = `
+    <h3>WordPress Plugin</h3>
+    <p>Download the latest plugin (.zip) and upload it in WordPress → Plugins → Add New → Upload.</p>
+    <a class="cg-download-btn"
+       href="https://github.com/crmlegend/contentgenie/archive/refs/heads/main.zip"
+       target="_blank" rel="noopener">Download the plugin</a>
+  `;
+  content.prepend(card);
+});
+</script>
+{% endblock %}
