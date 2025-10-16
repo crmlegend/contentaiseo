@@ -40,10 +40,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     # local
-    "accounts",
+    "accounts.apps.AccountsConfig",  # ✅ keep only this
     "billing",
     "content",
 ]
+
 
 # --- Middleware (order matters) ---
 MIDDLEWARE = [
@@ -131,6 +132,11 @@ CSRF_TRUSTED_ORIGINS = [
     "https://cd3e7c147fe3.ngrok-free.app",
     "https://9d9cc56f9104.ngrok-free.app",
     "https://djangosubscriptionpanel-app-e8cxfagthcf5emga.canadacentral-01.azurewebsites.net",
+    "https://871ed428e636.ngrok-free.app",
+    "https://cd79f9e19024.ngrok-free.app",
+    "https://193edd64fb8d.ngrok-free.app",
+    "https://contentaiseo.com",
+
 ]
 
 # --- DRF ---
