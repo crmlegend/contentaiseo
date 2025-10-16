@@ -36,7 +36,8 @@ class ApiKey(models.Model):
     key_prefix = models.CharField(max_length=16, db_index=True)
 
     # Hash of the full key (prefix+suffix), unique for O(1) lookups
-    key_hash = models.CharField(max_length=255, unique=True, db_index=True)
+    key_hash = models.CharField(max_length=255, db_index=True)  # no unique=True
+
 
     # Optional tenancy/bookkeeping
     tenant_id = models.CharField(max_length=128)
