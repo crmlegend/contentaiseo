@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Python version
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.11'   # ✅ use 3.11 for Azure compatibility
 
       - name: Create and start virtual environment
         run: |
@@ -35,7 +35,7 @@ jobs:
       - name: Collect static (Django)
         run: python manage.py collectstatic --noinput
         
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
+      # Optional: run tests here
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
@@ -49,27 +49,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_41DB0087BF6843C7AC69CB1148003F76 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A2CEB0542C42467D930C3DA7565F1C06 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0C1D698B1FAC45FDAC16D9038096EE55 }}
 
-      - name: 'Deploy to Azure Web App'
+      # ❌ Removed azure/login (not needed with publish profile)
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
-          app-name: 'djangosubscriptionpanel-app'
-          slot-name: 'Production'
+          app-name: djangosubscriptionpanel-app
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .
 
           
+
