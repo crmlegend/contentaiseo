@@ -337,6 +337,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
+    "https://contentaiseo.com/",
 ]
 
 # ---------------- DRF ----------------
