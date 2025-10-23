@@ -336,16 +336,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ---------------- CORS / CSRF ----------------
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = [
-    # add your Azure site(s) here if needed:
-    # "https://yourappname.azurewebsites.net",
-    "https://cd3e7c147fe3.ngrok-free.app",
-    "https://9d9cc56f9104.ngrok-free.app",
-    "https://djangosubscriptionpanel-app-e8cxfagthcf5emga.canadacentral-01.azurewebsites.net",
-    "https://871ed428e636.ngrok-free.app",
-    "https://cd79f9e19024.ngrok-free.app",
     "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
-    "https://contentaiseo.com/",
-    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net/",
 ]
 
 # ---------------- DRF ----------------
