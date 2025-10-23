@@ -9,6 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------- Security / Env ----------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "devsecret")  # local fallback only
 DEBUG = os.getenv("DEBUG", "0") == "1"
+
+# Your public hostnames (no schemes, no slashes)
 ALLOWED_HOSTS = [
     "contentaiseo.com",
     "www.contentaiseo.com",
@@ -29,15 +31,13 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-# Are we running on Azure App Service?
+# Detect Azure App Service
 IS_AZURE = bool(os.environ.get("WEBSITE_SITE_NAME"))
 
 def _safe_mkdir(path: str) -> None:
-    """Create directory if we have permission. Avoids CI failures."""
     try:
         os.makedirs(path, exist_ok=True)
     except PermissionError:
-        # On GitHub runners, creating /home/* is not allowed—skip silently.
         pass
 
 # ---------------- Installed apps ----------------
@@ -57,13 +57,45 @@ INSTALLED_APPS = [
     "content",
 ]
 
+# ---------------- Security / cookies / proxy ----------------
+# Azure runs behind a reverse proxy and terminates TLS there.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+# Use secure cookies in prod
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = ["https://contentaiseo.com", "https://www.contentaiseo.com"]
+# Keep cookies same-site to avoid accidental cross-site sends
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 
+# If you serve both root + www, you do NOT need CSRF_COOKIE_DOMAIN.
+# If you wanted a single cookie for subdomains of contentaiseo.com only,
+# you could set: CSRF_COOKIE_DOMAIN = ".contentaiseo.com"
+
+# ---------------- CORS / CSRF ----------------
+# Goal: eliminate CSRF problems for APIs by not using cookies across origins.
+# Allow any origin for API *without* credentials. Forms on your own site still use CSRF.
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = False  # critical to avoid cross-site cookies/CSRF
+
+# If you ever *must* send credentials from a specific frontend origin,
+# switch to:
+# CORS_ALLOW_ALL_ORIGINS = False
+# CORS_ALLOWED_ORIGINS = ["https://contentaiseo.com", "https://www.contentaiseo.com"]
+# CORS_ALLOW_CREDENTIALS = True
+# ...and ensure your JS includes credentials + X-CSRFToken.
+
+# Origins that are allowed to set the CSRF cookie and submit POST forms
+CSRF_TRUSTED_ORIGINS = [
+    "https://contentaiseo.com",
+    "https://www.contentaiseo.com",
+    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
+]
+
+# Leave default header name; your JS can read csrftoken cookie (HttpOnly=False by default)
+# and send X-CSRFToken for same-site AJAX calls.
 
 # ---------------- Middleware ----------------
 MIDDLEWARE = [
@@ -72,7 +104,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",  # keep: protects your Django forms
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
@@ -98,14 +130,11 @@ ROOT_URLCONF = "core.urls"
 WSGI_APPLICATION = "core.wsgi.application"
 
 # ---------------- Database (SQLite with Azure-safe path) ----------------
-# Azure: use /home (writable). CI/local: use project file.
 SQLITE_PATH = os.getenv(
     "SQLITE_PATH",
     "/home/data/app.db" if IS_AZURE else str(BASE_DIR / "db.sqlite3"),
 )
-
 _sqlite_dir = os.path.dirname(SQLITE_PATH)
-# Only try to create if it’s under /home or inside the repo
 if SQLITE_PATH.startswith("/home/") or SQLITE_PATH.startswith(str(BASE_DIR)):
     _safe_mkdir(_sqlite_dir)
 
@@ -143,25 +172,14 @@ STORAGES = {
 
 # ---------------- Media ----------------
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.getenv(
-    "MEDIA_ROOT",
-    "/home/data/media" if IS_AZURE else str(BASE_DIR / "media"),
-)
-# Only create if under /home or repo path
+MEDIA_ROOT = os.getenv("MEDIA_ROOT", "/home/data/media" if IS_AZURE else str(BASE_DIR / "media"))
 if MEDIA_ROOT.startswith("/home/") or MEDIA_ROOT.startswith(str(BASE_DIR)):
     _safe_mkdir(MEDIA_ROOT)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ---------------- CORS / CSRF ----------------
-CORS_ALLOW_ALL_ORIGINS = True
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://contentaiseo.com",   # ← no trailing slash
-    "https://www.contentaiseo.com",
-    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
-]
 # ---------------- DRF ----------------
+# IMPORTANT: No SessionAuthentication => no CSRF required for API views.
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -193,5 +211,3 @@ LOGGING = {
         "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }
-
-
