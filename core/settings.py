@@ -70,9 +70,17 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SAMESITE = "Lax"
 
-# Allow cookies to be valid on both root and www subdomains
-CSRF_COOKIE_DOMAIN = ".contentaiseo.com"
-SESSION_COOKIE_DOMAIN = ".contentaiseo.com"
+# ---- Conditional cookie domain (fixes CSRF on staging/localhost) ----
+# Set REQUEST_HOST=contentaiseo.com only in production (Azure App Settings).
+REQUEST_HOST = os.environ.get("REQUEST_HOST", "").strip().lower()
+if REQUEST_HOST.endswith("contentaiseo.com"):
+    # Allow cookies to be valid on both apex and www in prod
+    CSRF_COOKIE_DOMAIN = ".contentaiseo.com"
+    SESSION_COOKIE_DOMAIN = ".contentaiseo.com"
+else:
+    # Host-only cookies on azurewebsites.net / localhost so browser accepts them
+    CSRF_COOKIE_DOMAIN = None
+    SESSION_COOKIE_DOMAIN = None
 
 # ---------------- CORS / CSRF ----------------
 # Goal: eliminate CSRF problems for APIs by not using cookies across origins.
