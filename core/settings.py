@@ -345,6 +345,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://cd79f9e19024.ngrok-free.app",
     "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
     "https://contentaiseo.com/",
+    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net/",
 ]
 
 # ---------------- DRF ----------------

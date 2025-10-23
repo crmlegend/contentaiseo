@@ -68,7 +68,7 @@ def start_checkout(request):
         user.stripe_customer_id = cust.id
         user.save(update_fields=["stripe_customer_id"])
 
-    site = request.data.get("site") or "https://contentaiseo.com/"
+    site = request.data.get("site") or "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net/"
     success_url = f"{site}/accounts/dashboard/?sub=success"
     cancel_url  = f"{site}/accounts/dashboard/?sub=cancel"
 
