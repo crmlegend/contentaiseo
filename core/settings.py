@@ -201,7 +201,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------- Security / Env ----------------
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "devsecret")  # local fallback only
 DEBUG = os.getenv("DEBUG", "0") == "1"
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "contentaiseo.com",
+    "www.contentaiseo.com",
+    "contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
+]
 
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
 TEST_KEY = os.getenv("TEST_KEY", "")
@@ -244,6 +248,14 @@ INSTALLED_APPS = [
     "billing",
     "content",
 ]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = ["https://contentaiseo.com", "https://www.contentaiseo.com"]
+
 
 # ---------------- Middleware ----------------
 MIDDLEWARE = [
@@ -335,11 +347,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ---------------- CORS / CSRF ----------------
 CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = [
-    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
-    "https://contentaiseo.com/",
-]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://contentaiseo.com",   # ← no trailing slash
+    "https://www.contentaiseo.com",
+    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
+]
 # ---------------- DRF ----------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -372,3 +385,5 @@ LOGGING = {
         "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }
+
+
