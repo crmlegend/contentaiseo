@@ -336,7 +336,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://djangosubscriptionpanel-app-e8cxfagthcf5emga.canadacentral-01.azurewebsites.net",
     "https://871ed428e636.ngrok-free.app",
     "https://cd79f9e19024.ngrok-free.app",
-    "contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
+    "https://contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
     "https://contentaiseo.com/",
 ]
 
