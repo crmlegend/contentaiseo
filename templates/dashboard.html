@@ -1,901 +1,627 @@
+{% load static %}
 <!DOCTYPE html>
-
 <html lang="en" class="scroll-smooth">
-
 <head>
-
-  <meta charset="utf-8" />
-
-  <title>Dashboard • ContentAISEO</title>
-
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <script>
-
-    tailwind.config = {
-
-      darkMode: 'class',
-
-      theme: {
-
-        extend: {
-
-          fontFamily: {
-
-            sans: ['Inter', 'sans-serif'],
-
-          },
-
-          colors: {
-
-            // New professional palette: Primary is a deep navy/slate, accent is the original purple COLOR .
-
-            primary: '#1e293b', // slate-800
-
-            accent: '#6d28d9',  // Brand-700
-
-          },
-
-          boxShadow: {
-
-            // Minimal shadow for a clean look
-
-            professional: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
-
-          },
-
+    <meta charset="utf-8" />
+    <title>Dashboard • ContentAISEO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // New professional palette: Primary is a deep navy/slate, accent is the original purple COLOR .
+                        primary: '#1e293b', // slate-800
+                        accent: '#6d28d9',  // Brand-700
+                    },
+                    boxShadow: {
+                        // Minimal shadow for a clean look
+                        professional: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+                        'xl-dark': '0 20px 25px -5px rgba(0,0,0,0.3)',
+                    },
+                }
+            }
         }
+    </script>
+    <style>
+        /* Custom styles for a minimal, professional look */
+        .focus-ring-accent{outline:none;box-shadow:0 0 0 3px rgba(109, 40, 217, .4)}
+        
+        /* Simplified input styles - clean, light border, minimal box-shadow */
+        input[type="text"],input[type="password"]{
+            border:1px solid #e2e8f0; border-radius:.4rem; padding:.6rem 1rem; width:100%;
+            background:#fff; color:#334155; font-size:.9rem;
+            transition:border-color .15s;
+            box-shadow:inset 0 1px 1px rgba(0,0,0,0.03);
+        }
+        input[type="text"]:disabled,input[type="password"]:disabled{background:#f8fafc; opacity:1; color:#94a3b8;}
+        input[type="text"]:focus,input[type="password"]:focus{
+            outline:none; border-color:#6d28d9;
+            box-shadow:0 0 0 1px #6d28d9, inset 0 1px 1px rgba(0,0,0,0.03);
+        }
+        .dark input[type="text"],.dark input[type="password"]{
+            background:#000; border-color:#334155; color:#cbd5e1;
+        }
+        .dark input[type="text"]:focus,.dark input[type="password"]:focus{
+            border-color:#6d28d9;
+            box-shadow:0 0 0 1px #6d28d9, inset 0 1px 1px rgba(0,0,0,0.03);
+        }
+        
+        /* General body background is cleaner white/black with no gradient */
+        .bg-professional { background-color: #f8fafc; } /* slate-50 */
+        .dark .bg-professional { background-color: #000; } /* pure black for max contrast */
 
-      }
+        /* Scrollbar style for professional environments */
+        .nice-scroll{scrollbar-width:thin; scrollbar-color: #94a3b8 #f1f5f9;}
+        .dark .nice-scroll{scrollbar-color: #475569 #0f172a;}
 
-    }
-
-  </script>
-
-  <style>
-
-    /* Custom styles for a minimal, professional look */
-
-    .focus-ring-accent{outline:none;box-shadow:0 0 0 3px rgba(109, 40, 217, .4)}
-
-    
-
-    /* Simplified input styles - clean, light border, minimal box-shadow */
-
-    input[type="text"],input[type="password"]{
-
-      border:1px solid #e2e8f0; border-radius:.4rem; padding:.6rem 1rem; width:100%;
-
-      background:#fff; color:#334155; font-size:.9rem;
-
-      transition:border-color .15s;
-
-      box-shadow:inset 0 1px 1px rgba(0,0,0,0.03);
-
-    }
-
-    input[type="text"]:disabled,input[type="password"]:disabled{background:#f8fafc; opacity:1; color:#94a3b8;}
-
-    input[type="text"]:focus,input[type="password"]:focus{
-
-      outline:none; border-color:#6d28d9;
-
-      box-shadow:0 0 0 1px #6d28d9, inset 0 1px 1px rgba(0,0,0,0.03);
-
-    }
-
-    .dark input[type="text"],.dark input[type="password"]{
-
-      background:#000; border-color:#334155; color:#cbd5e1;
-
-    }
-
-    .dark input[type="text"]:focus,.dark input[type="password"]:focus{
-
-      border-color:#6d28d9;
-
-      box-shadow:0 0 0 1px #6d28d9, inset 0 1px 1px rgba(0,0,0,0.03);
-
-    }
-
-    
-
-    /* General body background is cleaner white/black with no gradient */
-
-    .bg-professional { background-color: #f8fafc; } /* slate-50 */
-
-    .dark .bg-professional { background-color: #000; } /* pure black for max contrast */
-
-
-
-    /* Scrollbar style for professional environments */
-
-    .nice-scroll{scrollbar-width:thin; scrollbar-color: #94a3b8 #f1f5f9;}
-
-    .dark .nice-scroll{scrollbar-color: #475569 #0f172a;}
-
-  </style>
-
+        /* Class for multi-page simulation (SPA) */
+        .content-view { display: none; }
+        
+        /* Ensure the dashboard view is visible by default (handled by JS on load) */
+        #dashboard-view { display: block; } 
+    </style>
 </head>
-
 <body class="bg-professional text-slate-800 dark:text-slate-100 font-sans transition-colors duration-200">
+    <div class="min-h-screen flex">
 
-  <div class="min-h-screen flex">
-
-
-
-    <aside class="hidden md:flex md:w-64 flex-col border-r border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-950 shadow-professional">
-
-      <div class="h-16 px-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-800">
-
-        <div class="h-8 w-8 rounded-lg bg-primary text-white grid place-items-center text-sm font-bold shadow-md">
-
-          CG
-
-        </div>
-
-        <div>
-
-          <div class="text-lg font-bold tracking-tight text-primary dark:text-slate-100">ContentAISEO</div>
-
-        </div>
-
-      </div>
-
-      <nav class="flex-1 overflow-y-auto nice-scroll px-4 py-4 space-y-1">
-
-        <a href="#" class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold bg-accent/10 text-accent hover:text-accent transition duration-150">
-
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m5-11h5m-5 0v10a1 1 01-1 1h-3"/></svg>
-
-          Dashboard
-
-        </a>
-
-        <a href="#api" class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-150">
-
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-
-          API & Integrations
-
-        </a>
-
-        <a href="#billing" class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-150">
-
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0l-1 4h8l-1-4m-1 0H9m5 0a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-
-          Billing & Plan
-
-        </a>
-
-        <a href="#settings" class="group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-150">
-
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-
-          Account Settings
-
-        </a>
-
-      </nav>
-
-      <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-
-        <div>
-
-          <div class="text-xs text-slate-500 dark:text-slate-400">Signed in as</div>
-
-          <div class="text-sm font-medium truncate text-primary dark:text-slate-100">{{ request.user.email }}</div>
-
-        </div>
-
-        <button id="modeBtn" title="Toggle dark mode" class="p-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:text-primary dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-
-        </button>
-
-      </div>
-
-    </aside>
-
-
-
-    <div class="flex-1 min-w-0">
-
-      <div class="md:hidden sticky top-0 z-10 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
-
-        <div class="h-16 px-4 flex items-center justify-between">
-
-          <button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition" onclick="document.getElementById('mobileDrawer').classList.remove('hidden')">
-
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
-
-          </button>
-
-          <span class="text-lg font-bold tracking-tight text-primary dark:text-slate-100">ContentAISEO</span>
-
-          <button id="modeBtnM" title="Toggle dark mode" class="p-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:text-primary dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-
-          </button>
-
-        </div>
-
-      </div>
-
-
-
-      <main class="px-4 sm:px-8 py-8">
-
-        <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-professional p-8 mb-8">
-
-          <div class="flex items-center justify-between gap-6">
-
-            <div>
-
-              <h1 class="text-3xl font-bold tracking-tight text-primary dark:text-slate-50">ContentAISEO Control Center</h1>
-
-              <p class="text-base text-slate-500 dark:text-slate-400 mt-2">Manage your subscription, credentials, and integration settings.</p>
-
+        <aside class="hidden md:flex md:w-64 flex-col border-r border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-950 shadow-professional">
+            <div class="h-16 px-6 flex items-center gap-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="text-lg font-bold tracking-tight text-primary dark:text-slate-100">ContentAISEO</div>
             </div>
-
-            <form method="post" action="{% url 'logout' %}">
-
-              {% csrf_token %}
-
-              <button type="submit"
-
-                      class="shrink-0 inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition duration-150 shadow-sm">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-
-                Sign Out
-
-              </button>
-
-            </form>
-
-          </div>
-
-        </div>
-
-
-
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-
-          
-
-          <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional">
-
-            <div class="flex items-start justify-between">
-
-              <div>
-
-                <div class="text-sm font-medium text-slate-500 dark:text-slate-400">Current Plan</div>
-
-                <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">{% if key %}{{ key.plan|default:"pro"|title }}{% else %}Free Trial{% endif %}</div>
-
-              </div>
-
-              <svg class="h-6 w-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2a3 3 0 100 6v-3.586l-2.293 2.293a1 1 0 01-1.414-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L12 14.414V17m0-13a9 9 0 100 18A9 9 0 0012 4z"/></svg>
-
-            </div>
-
-            <div class="text-xs text-slate-400 mt-2">Next billing date: N/A</div>
-
-          </div>
-
-
-
-          <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional">
-
-            <div class="flex items-start justify-between">
-
-              <div>
-
-                <div class="text-sm font-medium text-slate-500 dark:text-slate-400">API Key Status</div>
-
-                <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">{% if key %}Active{% else %}Inactive{% endif %}</div>
-
-              </div>
-
-              <svg class="h-6 w-6 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.111a9 9 0 11-12.828 0 9 9 0 0112.828 0z"/></svg>
-
-            </div>
-
-            <div class="text-xs text-slate-400 mt-2">Status: Fully Authenticated</div>
-
-          </div>
-
-
-
-          <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional">
-
-            <div class="flex items-start justify-between">
-
-              <div>
-
-                <div class="text-sm font-medium text-slate-500 dark:text-slate-400">Account Status</div>
-
-                <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">Validated</div>
-
-              </div>
-
-              <svg class="h-6 w-6 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-
-            </div>
-
-            <div class="text-xs text-slate-400 mt-2">User ID: **{{ request.user.id }}**</div>
-
-          </div>
-
-
-
-          <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional">
-
-            <div class="flex items-start justify-between">
-
-              <div>
-
-                <div class="text-sm font-medium text-slate-500 dark:text-slate-400">Last Login</div>
-
-                <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">{{ request.user.last_login|date:"M d, Y" }}</div>
-
-              </div>
-
-              <svg class="h-6 w-6 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-
-            </div>
-
-            <div class="text-xs text-slate-400 mt-2">Recent activity is logged.</div>
-
-          </div>
-
-        </section>
-
-
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-
-
-          <div class="lg:col-span-2 space-y-8">
-
-
-
-            <section id="settings" class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
-
-              <h2 class="text-2xl font-bold text-primary dark:text-slate-50">🔐 Profile & Security</h2>
-
-              <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Manage your authentication details and primary account information.</p>
-
-
-
-              <form method="post" class="space-y-6 mt-6 border-t border-slate-100 dark:border-slate-800 pt-6" id="profileForm">
-
-                {% csrf_token %}
-
-                <input type="hidden" name="action" value="update_profile" />
-
+            <nav class="flex-1 overflow-y-auto nice-scroll px-4 py-4 space-y-1" id="desktopNav">
+                <a href="#dashboard" data-view="dashboard" class="nav-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold bg-accent/10 text-accent transition duration-150">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m5-11h5m-5 0v10a1 1 01-1 1h-3"/></svg>
+                    Dashboard
+                </a>
+                <a href="#api" data-view="api" class="nav-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-150">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    API & Integrations
+                </a>
+                <a href="#billing" data-view="billing" class="nav-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-150">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0l-1 4h8l-1-4m-1 0H9m5 0a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Billing & Plan
+                </a>
+                <a href="#settings" data-view="settings" class="nav-link group flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition duration-150">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Account Settings
+                </a>
+            </nav>
+            <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
                 <div>
-
-                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Username</label>
-
-                  {{ profile_form.username }}
-
-                  <p class="text-xs text-slate-400 mt-1">Your primary identifier across the platform.</p>
-
+                    <div class="text-xs text-slate-500 dark:text-slate-400">Signed in as</div>
+                    <div class="text-sm font-medium truncate text-primary dark:text-slate-100">{{ request.user.email }}</div>
                 </div>
+                <button id="modeBtn" title="Toggle dark mode" class="p-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:text-primary dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </aside>
 
-                <div class="flex gap-3">
-
-                  <button type="button" id="enableProfile"
-
-                          class="inline-flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">
-
-                    Enable Edit
-
-                  </button>
-
-                  <button type="submit" id="saveProfile" disabled
-
-                          class="inline-flex items-center rounded-lg bg-accent text-white px-4 py-2 text-sm font-semibold hover:bg-brand-600 focus-ring-accent disabled:opacity-50 transition shadow-md shadow-accent/30">
-
-                    Save Username
-
-                  </button>
-
+        <div class="flex-1 min-w-0">
+            <div class="md:hidden sticky top-0 z-10 bg-white/95 dark:bg-slate-950/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
+                <div class="h-16 px-4 flex items-center justify-between">
+                    <button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition" onclick="document.getElementById('mobileDrawer').classList.remove('hidden')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+                    </button>
+                    <span class="text-lg font-bold tracking-tight text-primary dark:text-slate-100">ContentAISEO</span>
+                    <button id="modeBtnM" title="Toggle dark mode" class="p-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-500 hover:text-primary dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
                 </div>
+            </div>
 
-              </form>
+            <main class="px-4 sm:px-8 py-8">
 
-
-
-              <form method="post" class="space-y-6 mt-8 border-t border-slate-100 dark:border-slate-800 pt-6" id="passwordForm">
-
-                {% csrf_token %}
-
-                <input type="hidden" name="action" value="change_password" />
-
-                <div class="grid md:grid-cols-3 gap-5">
-
-                  <div>
-
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Current Password</label>
-
-                    {{ pwd_form.old_password }}
-
-                  </div>
-
-                  <div>
-
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Password</label>
-
-                    {{ pwd_form.new_password1 }}
-
-                  </div>
-
-                  <div>
-
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm New Password</label>
-
-                    {{ pwd_form.new_password2 }}
-
-                  </div>
-
-                </div>
-
-                <div class="flex gap-3">
-
-                  <button type="button" id="enablePassword"
-
-                          class="inline-flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">
-
-                    Enable Change
-
-                  </button>
-
-                  <button type="submit" id="savePassword" disabled
-
-                          class="inline-flex items-center rounded-lg bg-accent text-white px-4 py-2 text-sm font-semibold hover:bg-brand-600 focus-ring-accent disabled:opacity-50 transition shadow-md shadow-accent/30">
-
-                    Save New Password
-
-                  </button>
-
-                </div>
-
-              </form>
-
-            </section>
-
-
-
-            <section id="api" class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
-
-              <h2 class="text-2xl font-bold text-primary dark:text-slate-50">🔌 API Key Management</h2>
-
-              <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Access your full API key for integrations. <span class="font-bold text-rose-500 dark:text-rose-400">Treat this key as a secret.</span></p>
-
-
-
-              <div class="mt-6 space-y-4">
-
-                {% if raw_api_key %}
-
-                  <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4">
-
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">Your Full API Key</div>
-
-                    <div class="flex items-center justify-between gap-3">
-
-                      <p id="fullKey" class="text-sm font-mono text-slate-900 dark:text-slate-100 flex-1 break-all select-all">
-
-                        {{ raw_api_key }}
-
-                      </p>
-
-                      <button type="button" title="Copy key to clipboard" class="shrink-0 text-xs rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition" onclick="copyFullKey()">
-
-                        <svg class="h-4 w-4 inline mr-1 -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5h4m-4 0v4m4 0v-4m-4 4h4m-4 0h4m-4 4h4m-4 4h4m-4 0h4m4-12v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2"/></svg>
-
-                        Copy
-
-                      </button>
-
+                <section id="dashboard-view" class="content-view transition-opacity duration-300">
+                    <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-professional p-8 mb-8">
+                        <div class="flex items-center justify-between gap-6">
+                            <div>
+                                <h1 class="text-3xl font-bold tracking-tight text-primary dark:text-slate-50">ContentAISEO Control Center</h1>
+                                <p class="text-base text-slate-500 dark:text-slate-400 mt-2">Manage your subscription, credentials, and integration settings.</p>
+                            </div>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="shrink-0 inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition duration-150 shadow-sm">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                    Sign Out
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                  </div>
+                    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        
+                        <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional min-h-32">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-slate-500 dark:text-slate-400">Current Plan</div>
+                                    <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">
+                                        {% if key %}{{ key.plan|default:"pro"|title }}{% else %}Free Trial{% endif %}
+                                    </div>
+                                </div>
+                                <svg class="h-6 w-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2a3 3 0 100 6v-3.586l-2.293 2.293a1 1 0 01-1.414-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L12 14.414V17m0-13a9 9 0 100 18A9 9 0 0012 4z"/></svg>
+                            </div>
+                            <div class="text-xs text-slate-400 mt-2">Next billing date: N/A</div>
+                        </div>
 
-                {% else %}
+                        <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional min-h-32">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-slate-500 dark:text-slate-400">API Key Status</div>
+                                    <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">{% if key %}Active{% else %}Inactive{% endif %}</div>
+                                </div>
+                                <svg class="h-6 w-6 {% if key %}text-emerald-500{% else %}text-rose-500{% endif %}" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.111a9 9 0 11-12.828 0 9 9 0 0112.828 0z"/></svg>
+                            </div>
+                            <div class="text-xs text-slate-400 mt-2">Status: Fully Authenticated</div>
+                        </div>
 
-                  <div class="rounded-lg border border-rose-300 bg-rose-50 p-4 dark:border-rose-800 dark:bg-rose-900/20">
+                        <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional min-h-32">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-slate-500 dark:text-slate-400">Account Status</div>
+                                    <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">Validated</div>
+                                </div>
+                                <svg class="h-6 w-6 text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            </div>
+                            <div class="text-xs text-slate-400 mt-2">User ID: **{{ request.user.id }}**</div>
+                        </div>
 
-                    <p class="text-sm text-rose-700 dark:text-rose-300 font-medium">No active API key found. Please subscribe or renew your plan.</p>
+                        <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-professional min-h-32">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <div class="text-sm font-medium text-slate-500 dark:text-slate-400">Last Login</div>
+                                    <div class="mt-2 text-xl font-bold text-primary dark:text-slate-50">{{ request.user.last_login|date:"M d, Y" }}</div>
+                                </div>
+                                <svg class="h-6 w-6 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div class="text-xs text-slate-400 mt-2">Recent activity is logged.</div>
+                        </div>
 
-                  </div>
+                        <div id="usage-card-dashboard" class="lg:col-span-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                            <h2 class="text-xl font-bold text-primary dark:text-slate-50">📊 Request Usage</h2>
+                            {% if is_trial %}
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Trial limit: <span class="font-bold text-primary dark:text-slate-50">{{ trial_used }} / {{ trial_quota }}</span> requests used</p>
+                            {% widthratio trial_used trial_quota 100 as trial_percent %}
+                            <div class="mt-4 h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-accent" style="width: {{ trial_percent }}%;"></div>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-2">Upgrade now to unlock unlimited access.</p>
+                            {% elif is_subscribed %}
+                            <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-2">Unlimited Access</p>
+                            <p class="text-sm text-slate-400 mt-1">Your paid plan gives you unlimited request capacity.</p>
+                            {% else %}
+                            <p class="text-lg font-bold text-rose-600 dark:text-rose-400 mt-2">No Active Subscription</p>
+                            <p class="text-sm text-slate-400 mt-1">Please start a subscription to get your API key.</p>
+                            {% endif %}
+                        </div>
 
-                {% endif %}
+                        <div id="billing-summary-dashboard" class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                            <h3 class="text-xl font-bold text-primary dark:text-slate-50">💳 Subscription Status</h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Manage your plan or upgrade your access.</p>
+                            <button onclick="navigate('billing')"
+                                    class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 focus-ring-accent focus:ring-emerald-500 disabled:opacity-60 transition shadow-md shadow-emerald-500/30">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Manage Plan
+                            </button>
+                        </div>
+                        
+                        <div id="plugin-card-dashboard" class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                            <h2 class="text-xl font-bold text-primary dark:text-slate-50">💾 WordPress Plugin</h2>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                                Integrate ContentAISEO directly into your site.
+                            </p>
+                            <a href="https://github.com/crmlegend/contentgenie/archive/refs/heads/main.zip"
+                                class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-white hover:bg-brand-600 focus-ring-accent transition shadow-md shadow-accent/30"
+                                download>
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                Download Plugin (.zip)
+                            </a>
+                        </div>
+                    </section>
+                </section>
 
-              </div>
+                <section id="settings-view" class="content-view transition-opacity duration-300">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-8">
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
+                                <h2 class="text-2xl font-bold text-primary dark:text-slate-50">🔐 Profile & Security</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Manage your authentication details and primary account information.</p>
 
-            </section>
+                                <form onsubmit="return false;" class="space-y-6 mt-6 border-t border-slate-100 dark:border-slate-800 pt-6" id="profileForm">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="update_profile" />
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Username</label>
+                                        {{ profile_form.username }}
+                                        <p class="text-xs text-slate-400 mt-1">Your primary identifier across the platform.</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button type="button" id="enableProfile" class="inline-flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">
+                                            Enable Edit
+                                        </button>
+                                        <button type="submit" id="saveProfile" disabled class="inline-flex items-center rounded-lg bg-accent text-white px-4 py-2 text-sm font-semibold hover:bg-brand-600 focus-ring-accent disabled:opacity-50 transition shadow-md shadow-accent/30"
+                                            onclick="showToast('Username Saved!', 'success')">
+                                            Save Username
+                                        </button>
+                                    </div>
+                                </form>
 
-          </div>
+                                <form onsubmit="return false;" class="space-y-6 mt-8 border-t border-slate-100 dark:border-slate-800 pt-6" id="passwordForm">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="change_password" />
+                                    <div class="grid md:grid-cols-3 gap-5">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Current Password</label>
+                                            {{ pwd_form.old_password }}
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Password</label>
+                                            {{ pwd_form.new_password1 }}
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm New Password</label>
+                                            {{ pwd_form.new_password2 }}
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button type="button" id="enablePassword" class="inline-flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">
+                                            Enable Change
+                                        </button>
+                                        <button type="submit" id="savePassword" disabled class="inline-flex items-center rounded-lg bg-accent text-white px-4 py-2 text-sm font-semibold hover:bg-brand-600 focus-ring-accent disabled:opacity-50 transition shadow-md shadow-accent/30"
+                                            onclick="showToast('Password Changed!', 'success')">
+                                            Save New Password
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                                <h2 class="text-xl font-bold text-primary dark:text-slate-50">Account Status Summary</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                                    Your account is fully **Validated** and signed in as **{{ request.user.email }}**.
+                                </p>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-4">
+                                    For security questions or data export requests, please contact support.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
+                <section id="api-view" class="content-view transition-opacity duration-300">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-8">
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
+                                <h2 class="text-2xl font-bold text-primary dark:text-slate-50">🔌 API Key Management</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Access your full API key for integrations. <span class="font-bold text-rose-500 dark:text-rose-400">Treat this key as a secret.</span></p>
 
+                                <div class="mt-6 space-y-4">
+                                    {% if raw_api_key %}
+                                    <div class="rounded-lg border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-inner">
+                                        <div class="text-xs text-slate-500 dark:text-slate-400 mb-2 font-medium">Your Full API Key</div>
+                                        <div class="flex items-center justify-between gap-3">
+                                            <p id="fullKey" class="text-sm font-mono text-slate-900 dark:text-slate-100 flex-1 break-all select-all">
+                                                {{ raw_api_key }}
+                                            </p>
+                                            <button type="button" title="Copy key to clipboard" class="shrink-0 text-xs rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition" onclick="copyFullKey()">
+                                                <svg class="h-4 w-4 inline mr-1 -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5h4m-4 0v4m4 0v-4m-4 4h4m-4 0h4m-4 4h4m-4 4h4m-4 0h4m4-12v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2"/></svg>
+                                                Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="rounded-lg border border-rose-300 bg-rose-50 p-4 dark:border-rose-800 dark:bg-rose-900/20">
+                                        <p class="text-sm text-rose-700 dark:text-rose-300 font-medium">No active API key found. Please subscribe or renew your plan.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                                <h2 class="text-xl font-bold text-primary dark:text-slate-50">💾 WordPress Plugin</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                                    Integrate ContentAISEO directly into your WordPress site.
+                                </p>
+                                <a href="https://github.com/crmlegend/contentgenie/archive/refs/heads/main.zip"
+                                    class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-white hover:bg-brand-600 focus-ring-accent transition shadow-md shadow-accent/30"
+                                    download>
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    Download Plugin (.zip)
+                                </a>
+                            </div>
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                                <h2 class="text-xl font-bold text-primary dark:text-slate-50">📊 Usage Summary</h2>
+                                {% if is_subscribed %}
+                                <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-2">Unlimited Access</p>
+                                <p class="text-sm text-slate-400 mt-1">Your paid plan provides unlimited API requests.</p>
+                                {% else %}
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Trial limit: <span class="font-bold text-primary dark:text-slate-50">{{ trial_used }} / {{ trial_quota }}</span> requests used</p>
+                                {% widthratio trial_used trial_quota 100 as trial_percent %}
+                                <div class="mt-4 h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-accent" style="width: {{ trial_percent }}%;"></div>
+                                </div>
+                                <button onclick="navigate('billing')" class="mt-3 text-xs font-semibold text-accent hover:underline">Upgrade Now</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-          <div class="space-y-8">
+                <section id="billing-view" class="content-view transition-opacity duration-300">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-8">
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
+                                <h2 class="text-2xl font-bold text-primary dark:text-slate-50">💳 Manage Subscription</h2>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Control your plan, payment methods, and billing history.</p>
+                                
+                                <div class="space-y-6 mt-6 border-t border-slate-100 dark:border-slate-800 pt-6">
+                                    <div class="p-4 rounded-lg bg-white dark:bg-slate-950 border-2 border-slate-300 dark:border-slate-700 shadow-inner">
+                                        <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Current Plan: {% if is_subscribed %}Pro (Monthly){% else %}Free Trial{% endif %}</p>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                            {% if is_subscribed %}
+                                            Your subscription grants unlimited access to all features. Next renewal: N/A.
+                                            {% else %}
+                                            Your free trial includes {{ trial_quota }} requests. Upgrade to Pro for unlimited access.
+                                            {% endif %}
+                                        </p>
+                                    </div>
 
-            
-
-            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
-
-              <h2 class="text-xl font-bold text-primary dark:text-slate-50">📊 Request Usage</h2>
-
-              {% if is_trial %}
-
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Trial limit: <span class="font-bold text-primary dark:text-slate-50">{{ trial_used }} / {{ trial_quota }}</span> requests used</p>
-
-                {% widthratio trial_used trial_quota 100 as trial_percent %}
-
-                <div class="mt-4 h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-
-                  <div class="h-full bg-accent" style="width: {{ trial_percent }}%;"></div>
-
+                                    <button id="subscribeBtn" onclick="subscribe()"
+                                            class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 focus-ring-accent focus:ring-emerald-500 disabled:opacity-60 transition shadow-md shadow-emerald-500/30">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        Go to Secure Checkout Portal
+                                    </button>
+                                    <p id="subError" class="hidden mt-3 text-sm text-rose-600"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-8">
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                                <h3 class="text-xl font-bold text-primary dark:text-slate-50">Need Help?</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                                    If you have questions about invoices, refunds, or payment details, please review our FAQ or contact our dedicated billing support team.
+                                </p>
+                                <a href="#" class="mt-4 inline-block text-sm font-semibold text-accent hover:underline">Read Billing FAQ</a>
+                            </div>
+                            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
+                                <h2 class="text-xl font-bold text-primary dark:text-slate-50">📊 Request Usage</h2>
+                                {% if is_subscribed %}
+                                <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-2">Unlimited Access</p>
+                                <p class="text-sm text-slate-400 mt-1">Your paid plan provides unlimited API requests.</p>
+                                {% else %}
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Trial limit: <span class="font-bold text-primary dark:text-slate-50">{{ trial_used }} / {{ trial_quota }}</span> requests used</p>
+                                {% widthratio trial_used trial_quota 100 as trial_percent %}
+                                <div class="mt-4 h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-accent" style="width: {{ trial_percent }}%;"></div>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Remaining trial capacity shown above.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="mt-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
+                    <h2 class="text-xl font-bold text-primary dark:text-slate-50">Enterprise-Grade Content Generation</h2>
+                    <p class="text-base text-slate-500 dark:text-slate-400 mt-2">
+                        We are committed to providing reliable, scalable content solutions. For specialized integrations or dedicated support, please contact our enterprise team.
+                    </p>
                 </div>
+            </main>
+        </div>
+    </div>
 
-                <p class="text-xs text-slate-400 mt-2">Upgrade now to unlock unlimited access.</p>
-
-              {% elif is_subscribed %}
-
-                <p class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-2">Unlimited Access</p>
-
-                <p class="text-sm text-slate-400 mt-1">Your paid plan gives you unlimited request capacity.</p>
-
-              {% else %}
-
-                <p class="text-lg font-bold text-rose-600 dark:text-rose-400 mt-2">No Active Subscription</p>
-
-                <p class="text-sm text-slate-400 mt-1">Please start a subscription to get your API key.</p>
-
-              {% endif %}
-
+    <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/50 transition-opacity" onclick="this.parentElement.classList.add('hidden')"></div>
+        <div class="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-8">
+                <div class="text-lg font-bold text-primary dark:text-slate-100">ContentAISEO</div>
+                <button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition" onclick="document.getElementById('mobileDrawer').classList.add('hidden')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
-
-
-
-            <section id="billing" class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
-
-              <h3 class="text-xl font-bold text-primary dark:text-slate-50">💳 Subscription Status</h3>
-
-              <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Quickly manage your plan and payment details securely.</p>
-
-
-
-              <button id="subscribeBtn" onclick="subscribe()"
-
-                      class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 focus-ring-accent focus:ring-emerald-500 disabled:opacity-60 transition shadow-md shadow-emerald-500/30">
-
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-
-                Start/Manage Subscription
-
-              </button>
-
-              <p id="subError" class="hidden mt-3 text-sm text-rose-600"></p>
-
-              <div class="mt-4 grid grid-cols-2 gap-3">
-
-                <a href="#api" class="text-center rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">View API Docs</a>
-
-                <a href="#settings" class="text-center rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Account Profile</a>
-
-              </div>
-
-            </section>
-
-
-
-            <div class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-professional">
-
-              <h2 class="text-xl font-bold text-primary dark:text-slate-50">💾 WordPress Plugin</h2>
-
-              <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
-
-                Integrate ContentAISEO directly into your WordPress site.
-
-              </p>
-
-              <a href="https://github.com/crmlegend/contentgenie/archive/refs/heads/main.zip"
-
-                 class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-white hover:bg-brand-600 focus-ring-accent transition shadow-md shadow-accent/30"
-
-                 download>
-
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-
-                Download Plugin (.zip)
-
-              </a>
-
-            </div>
-
-          </div>
-
+            <nav class="space-y-1" id="mobileNav">
+                <a href="#dashboard" data-view="dashboard" class="nav-link-mobile block px-3 py-2 rounded-lg text-sm font-semibold bg-accent/10 text-accent">Dashboard</a>
+                <a href="#api" data-view="api" class="nav-link-mobile block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">API & Integrations</a>
+                <a href="#billing" data-view="billing" class="nav-link-mobile block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Billing & Plan</a>
+                <a href="#settings" data-view="settings" class="nav-link-mobile block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Account Settings</a>
+            </nav>
+            <div class="mt-8 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-4">{{ request.user.email }}</div>
         </div>
-
-
-
-        <div class="mt-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 shadow-professional">
-
-          <h2 class="text-xl font-bold text-primary dark:text-slate-50">Enterprise-Grade Content Generation</h2>
-
-          <p class="text-base text-slate-500 dark:text-slate-400 mt-2">
-
-            We are committed to providing reliable, scalable content solutions. For specialized integrations or dedicated support, please contact our enterprise team.
-
-          </p>
-
-        </div>
-
-      </main>
-
     </div>
 
-  </div>
-
-
-
-  <div id="mobileDrawer" class="fixed inset-0 z-50 hidden">
-
-    <div class="absolute inset-0 bg-black/50 transition-opacity" onclick="this.parentElement.classList.add('hidden')"></div>
-
-    <div class="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 p-6 shadow-2xl">
-
-      <div class="flex items-center justify-between mb-8">
-
-        <div class="flex items-center gap-3">
-
-          <div class="h-8 w-8 rounded-lg bg-primary text-white grid place-items-center text-sm font-bold">CG</div>
-
-          <div class="text-lg font-bold text-primary dark:text-slate-100">ContentAISEO</div>
-
+    <div id="toast" class="fixed bottom-6 right-6 hidden z-50">
+        <div id="toast-content" class="rounded-lg bg-slate-900 text-white text-sm px-4 py-2 shadow-xl flex items-center gap-2">
+            <svg id="toast-icon" class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Key copied to clipboard!
         </div>
-
-        <button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition" onclick="document.getElementById('mobileDrawer').classList.add('hidden')">
-
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-
-        </button>
-
-      </div>
-
-      <nav class="space-y-1">
-
-        <a href="#" class="block px-3 py-2 rounded-lg text-sm font-semibold bg-accent/10 text-accent">Dashboard</a>
-
-        <a href="#api" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">API & Integrations</a>
-
-        <a href="#billing" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Billing & Plan</a>
-
-        <a href="#settings" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Account Settings</a>
-
-      </nav>
-
-      <div class="mt-8 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-4">{{ request.user.email }}</div>
-
     </div>
 
-  </div>
-
-
-
-  <div id="toast" class="fixed bottom-6 right-6 hidden z-50">
-
-    <div class="rounded-lg bg-slate-900 text-white text-sm px-4 py-2 shadow-xl flex items-center gap-2">
-
-      <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-
-      Key copied to clipboard!
-
-    </div>
-
-  </div>
-
-
-
-  <script>
-
-    // Dark mode logic 
-
-    const root = document.documentElement;
-
-    const modeBtn = document.getElementById('modeBtn');
-
-    const modeBtnM = document.getElementById('modeBtnM');
-
-    const applyMode = (m)=>{
-
-      m === 'dark' ? root.classList.add('dark') : root.classList.remove('dark');
-
-      localStorage.setItem('cg-theme', m);
-
-    }
-
-    const saved = localStorage.getItem('cg-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-
-    applyMode(saved);
-
-    [modeBtn, modeBtnM].forEach(b => b && b.addEventListener('click',() => applyMode(root.classList.contains('dark') ? 'light' : 'dark')));
-
-
-
-    // Enable/disable logic for username + password forms
-
-    (function () {
-
-      // Username
-
-      const uname = document.querySelector('#profileForm input[name="username"]');
-
-      const saveProfile = document.getElementById('saveProfile');
-
-      const enableProfile = document.getElementById('enableProfile');
-
-      if (uname) {
-
-        uname.setAttribute('disabled', 'disabled');
-
-        saveProfile.setAttribute('disabled', 'disabled');
-
-        enableProfile.addEventListener('click', () => {
-
-          uname.removeAttribute('disabled');
-
-          uname.focus();
-
-          saveProfile.removeAttribute('disabled');
-
-          enableProfile.classList.add('hidden');
-
-        });
-
-      }
-
-
-
-      // Passwords - Note: the inputs are dynamically rendered by Django's form logic
-
-      const pwOld = document.querySelector('#passwordForm input[name="old_password"]');
-
-      const pw1   = document.querySelector('#passwordForm input[name="new_password1"]');
-
-      const pw2   = document.querySelector('#passwordForm input[name="new_password2"]');
-
-      const enablePassword = document.getElementById('enablePassword');
-
-      const savePassword   = document.getElementById('savePassword');
-
-
-
-      [pwOld, pw1, pw2].forEach(el => el && el.setAttribute('disabled','disabled'));
-
-      savePassword.setAttribute('disabled', 'disabled');
-
-
-
-      enablePassword.addEventListener('click', () => {
-
-        [pwOld, pw1, pw2].forEach(el => el && el.removeAttribute('disabled'));
-
-        pwOld && pwOld.focus();
-
-        savePassword.removeAttribute('disabled');
-
-        enablePassword.classList.add('hidden');
-
-      });
-
-    })();
-
-
-
-    async function subscribe(){
-
-      const btn = document.getElementById('subscribeBtn');
-
-      const err = document.getElementById('subError');
-
-      err.classList.add('hidden'); err.textContent = '';
-
-      const original = btn.innerHTML;
-
-      btn.innerHTML = '<span>Creating checkout...</span>';
-
-      btn.disabled = true;
-
-
-
-      try {
-
-        const r = await fetch('/billing/start/', {
-
-          method:'POST',
-
-          headers:{ 'Authorization': 'Bearer {{ access }}' }
-
-        });
-
-
-
-        if(!r.ok){
-
-          let msg = 'Failed to start checkout';
-
-          try { const j = await r.json(); if(j && j.detail) msg = j.detail; } catch(e){}
-
-          throw new Error(msg + ' (' + r.status + ')');
-
+    <script>
+        // --- SPA NAVIGATION LOGIC ---
+
+        const VIEWS = ['dashboard', 'settings', 'api', 'billing'];
+        const viewElements = {
+            'dashboard': document.getElementById('dashboard-view'),
+            'settings': document.getElementById('settings-view'),
+            'api': document.getElementById('api-view'),
+            'billing': document.getElementById('billing-view')
+        };
+        
+        function navigate(viewId) {
+            if (!VIEWS.includes(viewId)) {
+                viewId = 'dashboard'; // Default to dashboard
+            }
+
+            // 1. Update URL hash (for history and link sharing)
+            if (window.location.hash !== '#' + viewId) {
+                window.history.pushState(null, null, '#' + viewId);
+            }
+
+            // 2. Show/Hide main content views
+            VIEWS.forEach(id => {
+                const el = viewElements[id];
+                if (el) {
+                    el.style.display = id === viewId ? 'block' : 'none';
+                }
+            });
+
+            // 3. Update active state of sidebar links (Desktop and Mobile)
+            updateActiveLink(viewId);
+
+            // Hide mobile drawer if visible
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            if (mobileDrawer && !mobileDrawer.classList.contains('hidden')) {
+                mobileDrawer.classList.add('hidden');
+            }
         }
 
+        function updateActiveLink(viewId) {
+            const allLinks = document.querySelectorAll('.nav-link, .nav-link-mobile');
+            allLinks.forEach(link => {
+                const linkView = link.getAttribute('data-view');
+                const isActive = linkView === viewId;
 
+                const inactiveClassesDesktop = ['text-slate-600', 'dark:text-slate-400', 'font-medium', 'hover:bg-slate-100', 'dark:hover:bg-slate-800'];
+                const inactiveClassesMobile = ['text-slate-600', 'dark:text-slate-300', 'font-medium', 'hover:bg-slate-100', 'dark:hover:bg-slate-800'];
 
-        const j = await r.json();
+                const activeClasses = ['bg-accent/10', 'text-accent', 'font-semibold'];
+                
+                link.classList.remove(...activeClasses);
 
-        if(!j.url){ throw new Error('No checkout URL returned'); }
+                if (link.classList.contains('nav-link')) {
+                    link.classList.add(...inactiveClassesDesktop);
+                } else if (link.classList.contains('nav-link-mobile')) {
+                    link.classList.add(...inactiveClassesMobile);
+                }
 
-        location.href = j.url;
+                if (isActive) {
+                    link.classList.add(...activeClasses);
+                    if (link.classList.contains('nav-link')) {
+                        link.classList.remove(...inactiveClassesDesktop);
+                    } else if (link.classList.contains('nav-link-mobile')) {
+                        link.classList.remove(...inactiveClassesMobile);
+                    }
+                }
+            });
+        }
 
-      } catch(e){
+        // Event listeners for navigation links
+        document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                const viewId = link.getAttribute('data-view');
+                navigate(viewId);
+            });
+        });
 
-        err.textContent = e.message || 'Something went wrong';
+        // Handle browser back/forward buttons
+        window.onhashchange = () => {
+            const hash = window.location.hash.replace('#', '');
+            navigate(hash || 'dashboard');
+        };
+        
+        // Initial load check
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialHash = window.location.hash.replace('#', '') || 'dashboard';
+            navigate(initialHash);
 
-        err.classList.remove('hidden');
+            // Set initial state for form inputs and event listeners
+            (function () {
+                const uname = document.querySelector('#profileForm input[name="username"]');
+                const saveProfile = document.getElementById('saveProfile');
+                const enableProfile = document.getElementById('enableProfile');
+                if (uname) {
+                    enableProfile.addEventListener('click', () => {
+                        uname.removeAttribute('disabled');
+                        uname.focus();
+                        saveProfile.removeAttribute('disabled');
+                        enableProfile.classList.add('hidden');
+                        showToast('Editing enabled for username.', 'info');
+                    });
+                }
 
-      } finally {
+                const pwInputs = document.querySelectorAll('#passwordForm input[type="password"]');
+                const enablePassword = document.getElementById('enablePassword');
+                const savePassword = document.getElementById('savePassword');
 
-        btn.innerHTML = original;
+                enablePassword.addEventListener('click', () => {
+                    pwInputs.forEach(el => el && el.removeAttribute('disabled'));
+                    pwInputs[0] && pwInputs[0].focus();
+                    savePassword.removeAttribute('disabled');
+                    enablePassword.classList.add('hidden');
+                    showToast('Editing enabled for password fields.', 'info');
+                });
+            })();
+        });
 
-        btn.disabled = false;
+        // --- UTILITY FUNCTIONS ---
+        
+        // Dark mode logic (kept for completeness)
+        const root = document.documentElement;
+        const modeBtn = document.getElementById('modeBtn');
+        const modeBtnM = document.getElementById('modeBtnM');
+        const applyMode = (m)=>{
+            m === 'dark' ? root.classList.add('dark') : root.classList.remove('dark');
+            localStorage.setItem('cg-theme', m);
+        }
+        const saved = localStorage.getItem('cg-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+        applyMode(saved);
+        [modeBtn, modeBtnM].forEach(b => b && b.addEventListener('click',() => applyMode(root.classList.contains('dark') ? 'light' : 'dark')));
 
-      }
+        // Toast message system
+        function showToast(message, type = 'success'){
+            const t = document.getElementById('toast');
+            const tc = document.getElementById('toast-content');
 
-    }
+            let iconHtml = '';
+            let color = 'bg-slate-900';
 
+            if (type === 'success') {
+                iconHtml = '<svg class="h-5 w-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+            } else if (type === 'info') {
+                iconHtml = '<svg class="h-5 w-5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                color = 'bg-blue-600';
+            }
+            
+            tc.className = `rounded-lg text-white text-sm px-4 py-2 shadow-xl flex items-center gap-2 ${color}`;
+            tc.innerHTML = iconHtml + message;
 
+            t.classList.remove('hidden');
+            setTimeout(()=> t.classList.add('hidden'), 1800);
+        }
 
-    function copyFullKey(){
+        function copyFullKey(){
+            const el = document.getElementById('fullKey');
+            if(!el) return;
+            const text = el.textContent.trim();
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('API Key copied to clipboard!', 'success');
+        }
 
-      const el = document.getElementById('fullKey');
+        // Mock subscribe function (since we can't redirect to a real billing portal)
+        function subscribe() {
+            showToast('Simulating external billing portal redirect...', 'info');
+            setTimeout(() => {
+                showToast('Billing update successful! (Simulated)', 'success');
+            }, 1500);
+        }
 
-      if(!el) return;
-
-      const text = el.textContent.trim();
-
-      navigator.clipboard.writeText(text).then(showToast);
-
-    }
-
-
-
-    function showToast(){
-
-      const t = document.getElementById('toast');
-
-      t.classList.remove('hidden');
-
-      setTimeout(()=> t.classList.add('hidden'), 1800);
-
-    }
-
-  </script>
-
+    </script>
 </body>
-
 </html>
