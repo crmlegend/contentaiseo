@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from accounts import views as acc_views
 from content import views as content_views
 from billing import views as bill_views
-# NOTE: billing views are routed via billing/urls.py – no need to import them here
+# NOTE: billing views are routed via billing/urls.py – no need to import them heres
 
 # accounts/views.py (or another appropriate file)
 from django.shortcuts import render
