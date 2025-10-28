@@ -30,7 +30,7 @@ class RegisterSerializer(serializers.Serializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        email = validated_data["email"]             # already normalized in validate_email
+        email = validated_data["email"]             # already normalized in validate_emails
         password = validated_data["password"]
 
         if user_has_username_field():
