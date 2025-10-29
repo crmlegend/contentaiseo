@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "devsecret")  # local fallback only
 DEBUG = os.getenv("DEBUG", "0") == "1"
 
-# Your public hostnames (no schemes, no slashes)
+# Your public hostname (no schemes, no slashes)
 ALLOWED_HOSTS = [
     # "contentaiseo.com",
     # "www.contentaiseo.com",
