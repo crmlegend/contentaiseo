@@ -40,8 +40,8 @@ def upsert_keys_for_site(site, openai_key, gemini_key):
 def get_site_keys(site):
     s = norm_site(site)
     site_keys = TENANT_KEYS.get(s, {}) if s else {}
-    openai_key = site_keys.get("openai_key") or getattr(settings, "ENV_OPENAI_API_KEY", "") or ""
-    gemini_key = site_keys.get("gemini_key") or getattr(settings, "ENV_GEMINI_API_KEY", "") or ""
+    openai_key = site_keys.get("openai_key") or getattr(settings, "OPENAI_API_KEY", "") or ""
+    gemini_key = site_keys.get("gemini_key") or getattr(settings, "GEMINI_API_KEY", "") or ""
     logger.debug("get_site_keys site=%s openai=%s gemini=%s", s, bool(openai_key), bool(gemini_key))
     return {"openai_key": openai_key, "gemini_key": gemini_key}
 
