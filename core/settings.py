@@ -15,7 +15,6 @@ ALLOWED_HOSTS = [
     "contentaiseo.com",
     "www.contentaiseo.com",
     "contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
-    "*",
 ]
 
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
