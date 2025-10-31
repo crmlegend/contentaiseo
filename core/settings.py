@@ -11,11 +11,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "devsecret")  # local fallback only
 DEBUG = os.getenv("DEBUG", "0") == "1"
 
 # Your public hostname (no schemes, no slashes)
-ALLOWED_HOSTS = [
-    "contentaiseo.com",
-    "www.contentaiseo.com",
-    "contentseoai-c2ahaybrcha9hkcw.canadacentral-01.azurewebsites.net",
-]
+ALLOWED_HOSTS = ["*"]
 
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "")
 TEST_KEY = os.getenv("TEST_KEY", "")
